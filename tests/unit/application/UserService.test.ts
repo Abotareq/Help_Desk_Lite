@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { UserService } from '../../../src/application/services/UserService';
 import { UserRole } from '../../../src/domain/enums/UserRole';
 import { AppError } from '../../../src/shared/AppError';
+import { FakeRequestRepository } from '../../fakes/FakeRequestRepository';
 import { FakeUserRepository } from '../../fakes/FakeUserRepository';
 
 describe('UserService', () => {
@@ -11,7 +12,7 @@ describe('UserService', () => {
 
   beforeEach(() => {
     repo = new FakeUserRepository();
-    service = new UserService(repo);
+    service = new UserService(repo, new FakeRequestRepository());
   });
 
   describe('createUser', () => {

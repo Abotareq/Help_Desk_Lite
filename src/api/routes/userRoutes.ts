@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { CreateUserSchema, ListUsersSchema } from '../../application/dtos/CreateUserSchema';
 import { LoginSchema } from '../../application/dtos/LoginSchema';
+import { ResetPasswordSchema, UpdateUserSchema } from '../../application/dtos/UpdateUserSchema';
 import { UserRole } from '../../domain/enums/UserRole';
 import { authenticate } from '../../infrastructure/middlewares/authMiddleware';
 import { requireRole } from '../../infrastructure/middlewares/roleMiddleware';
@@ -35,6 +36,20 @@ export function buildUserRoutes(controller: UserController): Router {
     requireRole(UserRole.MANAGER, UserRole.AGENT),
     validate(ListUsersSchema),
     asyncHandler(controller.listUsers),
+  );
+
+  router.patch(
+    '/:id',
+    requireRole(UserRole.MANAGER),
+    validate(UpdateUserSchema),
+    asyncHandler(controller.updateUser),
+  );
+
+  router.post(
+    '/:id/password',
+    requireRole(UserRole.MANAGER),
+    validate(ResetPasswordSchema),
+    asyncHandler(controller.resetPassword),
   );
 
   return router;
