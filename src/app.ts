@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
+import { buildApiRouter } from './api/routes';
 import { errorHandler, notFoundHandler } from './infrastructure/middlewares/errorHandler';
 
 /**
@@ -17,6 +18,8 @@ export function createApp(): Express {
   app.get('/health', (_req, res) => {
     res.status(200).json({ status: 'ok', uptime: process.uptime() });
   });
+
+  app.use('/api', buildApiRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

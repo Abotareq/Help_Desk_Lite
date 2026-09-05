@@ -10,7 +10,7 @@ Node + Express + MongoDB (Mongoose) + TypeScript, with Zod for input validation 
 Built progressively. See the branch/PR history for each increment.
 
 - [x] Project scaffolding, config, error handling, test harness
-- [ ] Users, roles, authentication
+- [x] Users, roles, authentication
 - [ ] Request intake
 - [ ] Assignment and ownership
 - [ ] Status lifecycle and history
@@ -25,6 +25,35 @@ npm run dev
 ```
 
 `GET /health` should return `{ "status": "ok" }`.
+
+Then create the first manager account — every other user is created by a manager,
+so this is the only way in:
+
+```bash
+npm run seed
+```
+
+## Endpoints
+
+| Method | Path | Who | What |
+| --- | --- | --- | --- |
+| GET | `/health` | anyone | Liveness check |
+| POST | `/api/auth/login` | anyone | Exchange email + password for a JWT |
+| GET | `/api/users/me` | any signed-in user | The caller's own profile |
+| POST | `/api/users` | MANAGER | Create a user and set their role |
+| GET | `/api/users` | MANAGER, AGENT | List users, filterable by `role` and `isActive` |
+
+Authenticated calls send `Authorization: Bearer <token>`.
+
+## Roles
+
+| Role | Can |
+| --- | --- |
+| `EMPLOYEE` | Submit requests, track their own |
+| `AGENT` | Support/ops staff — claim, work and resolve requests |
+| `MANAGER` | Everything an agent can, plus see all requests, assign work, manage accounts |
+
+There is no public registration in v1: managers create accounts and set roles.
 
 ## Scripts
 
