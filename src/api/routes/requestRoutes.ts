@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AssignRequestSchema, ListMyRequestsSchema } from '../../application/dtos/AssignRequestSchema';
 import { CreateRequestSchema, RequestIdSchema } from '../../application/dtos/CreateRequestSchema';
+import { UpdateStatusSchema } from '../../application/dtos/UpdateStatusSchema';
 import { UserRole } from '../../domain/enums/UserRole';
 import { authenticate } from '../../infrastructure/middlewares/authMiddleware';
 import { requireRole } from '../../infrastructure/middlewares/roleMiddleware';
@@ -32,6 +33,12 @@ export function buildRequestRoutes(controller: RequestController): Router {
     validate(RequestIdSchema),
     asyncHandler(controller.claim),
   );
+
+  // No role gate here: who may move a request depends on their relationship to
+  // it (requester, assignee, manager), which only the service can see.
+  router.patch('/:id/status', validate(UpdateStatusSchema), asyncHandler(controller.updateStatus));
+
+  router.get('/:id/history', validate(RequestIdSchema), asyncHandler(controller.getHistory));
 
   router.patch(
     '/:id/assign',

@@ -13,7 +13,7 @@ Built progressively. See the branch/PR history for each increment.
 - [x] Users, roles, authentication
 - [x] Request intake
 - [x] Assignment and ownership
-- [ ] Status lifecycle and history
+- [x] Status lifecycle and history
 - [ ] Manager visibility
 
 ## Getting started
@@ -47,6 +47,8 @@ npm run seed
 | GET | `/api/requests/mine` | AGENT, MANAGER | The caller's own queue, highest priority first |
 | POST | `/api/requests/:id/claim` | AGENT, MANAGER | Take an unclaimed request |
 | PATCH | `/api/requests/:id/assign` | MANAGER | Assign, reassign, or return to the queue (`assigneeId: null`) |
+| PATCH | `/api/requests/:id/status` | depends on the move | Move the request through the workflow |
+| GET | `/api/requests/:id/history` | requester, assignee, manager | Full audit trail, oldest first |
 
 Authenticated calls send `Authorization: Bearer <token>`.
 
@@ -69,8 +71,36 @@ to `MEDIUM`). The requester comes from the token, never the body.
 Each request gets a sequential human-readable reference (`HD-000042`) alongside its id,
 opens as `NEW` and unassigned, and starts a history that every later change appends to.
 
-Statuses: `NEW` -> `IN_PROGRESS` -> `WAITING` -> `RESOLVED` -> `CLOSED`, with a reopen path
-out of `RESOLVED`. `CLOSED` is terminal.
+## Workflow
+
+```
+NEW ──▶ IN_PROGRESS ⇄ WAITING
+ │        │     ▲         │
+ │        ▼     └─ reopen ┘
+ │     RESOLVED ──▶ CLOSED
+ └──────────────────▶
+```
+
+Every legal move lives in one table at `src/domain/workflow/transitions.ts`; anything not
+in it is refused. The states were the PRD's biggest open question, so keeping them
+declarative means the workflow can be read against the answer instead of traced through a
+service.
+
+Who may make a move is expressed as a *relation* to the request, not a role:
+
+| Move | Who |
+| --- | --- |
+| `NEW` -> `IN_PROGRESS` | assignee, manager |
+| `NEW` -> `CLOSED` | requester (withdrawing), manager |
+| `IN_PROGRESS` -> `WAITING` / `RESOLVED` | assignee, manager |
+| `WAITING` -> `IN_PROGRESS` | requester (answering), assignee, manager |
+| `WAITING` -> `RESOLVED` | assignee, manager |
+| `RESOLVED` -> `IN_PROGRESS` (reopen) | requester, assignee, manager |
+| `RESOLVED` -> `CLOSED` | requester, assignee, manager |
+
+`CLOSED` is terminal. Reopening clears `resolvedAt`, so it always means "resolved this time
+round" rather than "was resolved once", and keeps the existing owner rather than dropping
+the request back on the queue.
 
 ## Ownership
 

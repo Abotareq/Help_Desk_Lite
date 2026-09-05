@@ -3,8 +3,10 @@ import { RequestStatus } from '../../domain/enums/RequestStatus';
 import { UserRole, isHandlerRole } from '../../domain/enums/UserRole';
 import type { IRequestRepository, PaginatedRequests } from '../../domain/interfaces/IRequestRepository';
 import type { IUserRepository } from '../../domain/interfaces/IUserRepository';
+import { ActorRelation, findTransition, nextStatuses } from '../../domain/workflow/transitions';
 import { AppError } from '../../shared/AppError';
 import type { CreateRequestInput } from '../dtos/CreateRequestSchema';
+import type { UpdateStatusInput } from '../dtos/UpdateStatusSchema';
 
 /** Who is acting, as far as the service is concerned. */
 export interface Actor {
@@ -127,6 +129,71 @@ export class RequestService {
     });
   }
 
+  /**
+   * The single gate every status change goes through. The legality of a move and
+   * who may make it both come from the transition table, so the rules live in one
+   * readable place rather than spread across controllers.
+   */
+  async updateStatus(id: string, input: UpdateStatusInput, actor: Actor): Promise<SupportRequest> {
+    const request = await this.requireRequest(id);
+
+    if (!canView(request, actor)) throw AppError.notFound('Request not found');
+
+    const { status: to, note } = input;
+    if (request.status === to) {
+      throw AppError.unprocessable(`This request is already ${to}`);
+    }
+
+    const { rule, fromIsTerminal } = findTransition(request.status, to);
+
+    if (fromIsTerminal) {
+      throw AppError.unprocessable(`${request.status} is final — nothing moves out of it`);
+    }
+    if (!rule) {
+      throw AppError.unprocessable(
+        `Cannot move a request from ${request.status} to ${to}. Allowed from here: ${nextStatuses(
+          request.status,
+        ).join(', ')}`,
+      );
+    }
+
+    const relations = relationsOf(request, actor);
+    if (!rule.allowed.some((allowed) => relations.has(allowed))) {
+      throw AppError.forbidden(rule.deniedMessage);
+    }
+
+    const now = new Date();
+    const entry: RequestHistoryEntry = {
+      type: rule.isReopen ? 'REOPENED' : 'STATUS_CHANGED',
+      fromStatus: request.status,
+      toStatus: to,
+      actorId: actor.id,
+      ...(note ? { note } : {}),
+      at: now,
+    };
+
+    // resolvedAt is cleared on reopen so it always means "resolved this time
+    // round" rather than "was resolved once".
+    const updated = await this.requests.update(
+      request.id,
+      {
+        status: to,
+        resolvedAt: to === RequestStatus.RESOLVED ? now : rule.isReopen ? null : undefined,
+        closedAt: to === RequestStatus.CLOSED ? now : undefined,
+      },
+      entry,
+    );
+    if (!updated) throw AppError.notFound('Request not found');
+
+    return updated;
+  }
+
+  /** The audit trail for one request, oldest first. */
+  async getHistory(id: string, actor: Actor): Promise<RequestHistoryEntry[]> {
+    const request = await this.getRequestById(id, actor);
+    return [...request.history].sort((a, b) => a.at.getTime() - b.at.getTime());
+  }
+
   private async requireRequest(id: string): Promise<SupportRequest> {
     const found = await this.requests.findById(id);
     if (!found) throw AppError.notFound('Request not found');
@@ -192,4 +259,17 @@ export function canView(request: SupportRequest, actor: Actor): boolean {
 
 function isTerminal(status: RequestStatus): boolean {
   return status === RequestStatus.CLOSED;
+}
+
+/**
+ * Turns an actor into the relations they hold for this particular request. The
+ * transition table is written in terms of these rather than roles, because
+ * "the assignee" and "whoever raised it" are what the rules actually depend on.
+ */
+function relationsOf(request: SupportRequest, actor: Actor): Set<ActorRelation> {
+  const relations = new Set<ActorRelation>();
+  if (request.requesterId === actor.id) relations.add(ActorRelation.REQUESTER);
+  if (request.assigneeId === actor.id) relations.add(ActorRelation.ASSIGNEE);
+  if (actor.role === UserRole.MANAGER) relations.add(ActorRelation.MANAGER);
+  return relations;
 }
