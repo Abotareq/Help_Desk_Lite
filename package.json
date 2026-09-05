@@ -1,7 +1,7 @@
 {
   "name": "helpdesk-lite-api",
   "version": "1.0.0",
-  "description": "HelpDesk Lite — internal support ticketing API (Node + Express + MongoDB + TypeScript)",
+  "description": "HelpDesk Lite \u2014 internal support ticketing API (Node + Express + MongoDB + TypeScript)",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
@@ -11,6 +11,7 @@
     "test": "jest --runInBand",
     "test:unit": "jest --runInBand tests/unit",
     "test:integration": "jest --runInBand tests/integration",
+    "test:coverage": "jest --runInBand --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "keywords": [

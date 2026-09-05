@@ -46,5 +46,8 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Coverage, not plain `npm test`: the thresholds in jest.config.ts are only
+      # evaluated when coverage is collected, so running the bare suite here
+      # would leave the floor inert.
       - name: Test
-        run: npm test
+        run: npm run test:coverage
