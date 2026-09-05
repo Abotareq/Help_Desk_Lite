@@ -4,6 +4,7 @@ import { RequestPriority } from '../../../src/domain/enums/RequestPriority';
 import { RequestStatus } from '../../../src/domain/enums/RequestStatus';
 import { UserRole } from '../../../src/domain/enums/UserRole';
 import { FakeRequestRepository } from '../../fakes/FakeRequestRepository';
+import { FakeUserRepository } from '../../fakes/FakeUserRepository';
 
 const employee: Actor = { id: '000000000000000000000001', role: UserRole.EMPLOYEE };
 const otherEmployee: Actor = { id: '000000000000000000000002', role: UserRole.EMPLOYEE };
@@ -23,7 +24,7 @@ describe('RequestService.createRequest', () => {
 
   beforeEach(() => {
     repo = new FakeRequestRepository();
-    service = new RequestService(repo);
+    service = new RequestService(repo, new FakeUserRepository());
   });
 
   it('opens the request as NEW, unassigned, owned by the submitter', async () => {
@@ -70,7 +71,7 @@ describe('RequestService.getRequestById', () => {
 
   beforeEach(async () => {
     repo = new FakeRequestRepository();
-    service = new RequestService(repo);
+    service = new RequestService(repo, new FakeUserRepository());
     const created = await service.createRequest(validInput, employee);
     requestId = created.id;
   });

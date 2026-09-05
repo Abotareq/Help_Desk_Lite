@@ -17,7 +17,7 @@ export function buildApiRouter(): Router {
   const requestRepository = new MongoRequestRepository();
 
   const userService = new UserService(userRepository);
-  const requestService = new RequestService(requestRepository);
+  const requestService = new RequestService(requestRepository, userRepository);
 
   const userController = new UserController(userService);
   const requestController = new RequestController(requestService);

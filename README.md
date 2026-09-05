@@ -12,7 +12,7 @@ Built progressively. See the branch/PR history for each increment.
 - [x] Project scaffolding, config, error handling, test harness
 - [x] Users, roles, authentication
 - [x] Request intake
-- [ ] Assignment and ownership
+- [x] Assignment and ownership
 - [ ] Status lifecycle and history
 - [ ] Manager visibility
 
@@ -44,6 +44,9 @@ npm run seed
 | GET | `/api/users` | MANAGER, AGENT | List users, filterable by `role` and `isActive` |
 | POST | `/api/requests` | any signed-in user | Submit a support request |
 | GET | `/api/requests/:id` | requester, assignee, manager | Read one request |
+| GET | `/api/requests/mine` | AGENT, MANAGER | The caller's own queue, highest priority first |
+| POST | `/api/requests/:id/claim` | AGENT, MANAGER | Take an unclaimed request |
+| PATCH | `/api/requests/:id/assign` | MANAGER | Assign, reassign, or return to the queue (`assigneeId: null`) |
 
 Authenticated calls send `Authorization: Bearer <token>`.
 
@@ -68,6 +71,16 @@ opens as `NEW` and unassigned, and starts a history that every later change appe
 
 Statuses: `NEW` -> `IN_PROGRESS` -> `WAITING` -> `RESOLVED` -> `CLOSED`, with a reopen path
 out of `RESOLVED`. `CLOSED` is terminal.
+
+## Ownership
+
+A request has one owner at a time. It starts unassigned; a handler claims it off the queue,
+and a manager can assign or reassign it, or hand it back with `assigneeId: null`. Claiming
+is not reassignment — taking work off whoever already owns it is a manager action, so a
+claim only succeeds on an unclaimed request.
+
+Picking up a `NEW` request also moves it to `IN_PROGRESS`. Something owned but still sitting
+in `NEW` is exactly the ambiguous state the PRD sets out to remove.
 
 Visibility: employees see only what they submitted, agents also see the unclaimed queue and
 their own assigned work, managers see everything. A request the caller cannot see returns
