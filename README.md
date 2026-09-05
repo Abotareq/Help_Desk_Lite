@@ -7,14 +7,14 @@ Node + Express + MongoDB (Mongoose) + TypeScript, with Zod for input validation 
 
 ## Status
 
-Built progressively. See the branch/PR history for each increment.
+v1 is complete. Built progressively — see the branch/PR history for each increment.
 
 - [x] Project scaffolding, config, error handling, test harness
 - [x] Users, roles, authentication
 - [x] Request intake
 - [x] Assignment and ownership
 - [x] Status lifecycle and history
-- [ ] Manager visibility
+- [x] Manager visibility
 
 ## Getting started
 
@@ -49,6 +49,8 @@ npm run seed
 | PATCH | `/api/requests/:id/assign` | MANAGER | Assign, reassign, or return to the queue (`assigneeId: null`) |
 | PATCH | `/api/requests/:id/status` | depends on the move | Move the request through the workflow |
 | GET | `/api/requests/:id/history` | requester, assignee, manager | Full audit trail, oldest first |
+| GET | `/api/requests` | any signed-in user, scoped | Filterable, paginated list |
+| GET | `/api/requests/stats` | any signed-in user, scoped | Dashboard counts |
 
 Authenticated calls send `Authorization: Bearer <token>`.
 
@@ -115,6 +117,44 @@ in `NEW` is exactly the ambiguous state the PRD sets out to remove.
 Visibility: employees see only what they submitted, agents also see the unclaimed queue and
 their own assigned work, managers see everything. A request the caller cannot see returns
 404 rather than 403, so the response does not confirm it exists.
+
+## The manager view
+
+`GET /api/requests` filters on `status`, `category`, `priority`, `assignee` and `requester`,
+pages with `page` and `limit`, and sorts with `sortBy` (`createdAt`, `updatedAt`, `priority`,
+`status`) and `sortDir`. Multi-value filters take either form:
+
+```
+/api/requests?status=NEW,WAITING&priority=HIGH&sortBy=priority
+/api/requests?status=NEW&status=WAITING
+```
+
+`assignee=unassigned` gives the unclaimed backlog.
+
+`GET /api/requests/stats` answers the aggregate question with the same filters:
+
+```json
+{
+  "total": 42,
+  "open": 17,
+  "unassigned": 5,
+  "byStatus": { "NEW": 5, "IN_PROGRESS": 9, "WAITING": 3, "RESOLVED": 20, "CLOSED": 5 },
+  "byAssignee": [{ "assigneeId": "652f...", "count": 9 }, { "assigneeId": null, "count": 5 }]
+}
+```
+
+Every status appears in `byStatus`, zeroes included — dashboard columns that appear and
+disappear as work moves are worse than useless.
+
+Both endpoints are open to every role. Scope is applied on top of the filters rather than
+instead of them, so no combination of query parameters lets a caller see more than their
+role allows: an employee filtering by someone else's id gets an empty list, not a 403.
+
+## Deferred to v2
+
+Out of scope for v1, by decision rather than omission: a self-service knowledge base,
+notifications of any kind, SLA tracking and escalation, multi-team routing, per-category
+confidentiality rules, and permissions finer than the three roles.
 
 ## Scripts
 

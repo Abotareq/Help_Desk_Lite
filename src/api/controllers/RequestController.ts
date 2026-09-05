@@ -1,4 +1,8 @@
 import type { Request, Response } from 'express';
+import type {
+  ListRequestsQuery,
+  RequestStatsQuery,
+} from '../../application/dtos/ListRequestsSchema';
 import type { RequestService } from '../../application/services/RequestService';
 import { requireUser } from '../../infrastructure/middlewares/authMiddleware';
 
@@ -27,6 +31,22 @@ export class RequestController {
       requireUser(req),
     );
     res.status(200).json({ request });
+  };
+
+  list = async (req: Request, res: Response): Promise<void> => {
+    const result = await this.requestService.listRequests(
+      req.query as unknown as ListRequestsQuery,
+      requireUser(req),
+    );
+    res.status(200).json(result);
+  };
+
+  stats = async (req: Request, res: Response): Promise<void> => {
+    const stats = await this.requestService.getStats(
+      req.query as unknown as RequestStatsQuery,
+      requireUser(req),
+    );
+    res.status(200).json(stats);
   };
 
   updateStatus = async (req: Request, res: Response): Promise<void> => {
