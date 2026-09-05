@@ -13,6 +13,7 @@ import { env } from '../src/config/env';
 import { UserRole } from '../src/domain/enums/UserRole';
 import type { PublicUser } from '../src/domain/entities/User';
 import type { IUserRepository } from '../src/domain/interfaces/IUserRepository';
+import { MongoRequestRepository } from '../src/infrastructure/repositories/MongoRequestRepository';
 import { MongoUserRepository } from '../src/infrastructure/repositories/MongoUserRepository';
 
 export interface SeedConfig {
@@ -47,7 +48,7 @@ export async function seedBootstrapManager(
   users: IUserRepository,
   config: SeedConfig,
 ): Promise<SeedResult> {
-  const service = new UserService(users);
+  const service = new UserService(users, new MongoRequestRepository());
 
   const existing = await users.findByEmail(config.email);
   if (existing) {

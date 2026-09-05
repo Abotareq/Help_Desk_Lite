@@ -25,6 +25,20 @@ export class UserController {
     res.status(200).json({ users, total: users.length });
   };
 
+  updateUser = async (req: Request, res: Response): Promise<void> => {
+    const result = await this.userService.updateUser(
+      req.params.id as string,
+      req.body,
+      requireUser(req),
+    );
+    res.status(200).json(result);
+  };
+
+  resetPassword = async (req: Request, res: Response): Promise<void> => {
+    const user = await this.userService.resetPassword(req.params.id as string, req.body);
+    res.status(200).json({ user });
+  };
+
   me = async (req: Request, res: Response): Promise<void> => {
     const user = await this.userService.getById(requireUser(req).id);
     res.status(200).json({ user });

@@ -1,6 +1,11 @@
 import type { User } from '../../domain/entities/User';
 import type { UserRole } from '../../domain/enums/UserRole';
-import type { CreateUserData, IUserRepository, ListUsersFilter } from '../../domain/interfaces/IUserRepository';
+import type {
+  CreateUserData,
+  IUserRepository,
+  ListUsersFilter,
+  UpdateUserData,
+} from '../../domain/interfaces/IUserRepository';
 import { UserModel, type UserHydrated } from '../database/models/UserModel';
 
 /** The only place that knows users live in Mongo. */
@@ -30,8 +35,25 @@ export class MongoUserRepository implements IUserRepository {
     return docs.map(toDomain);
   }
 
-  async countByRole(role: UserRole): Promise<number> {
-    return UserModel.countDocuments({ role });
+  async update(id: string, data: UpdateUserData): Promise<User | null> {
+    if (!isObjectIdLike(id)) return null;
+
+    const $set: Record<string, unknown> = {};
+    if (data.name !== undefined) $set.name = data.name;
+    if (data.role !== undefined) $set.role = data.role;
+    if (data.isActive !== undefined) $set.isActive = data.isActive;
+    if (data.passwordHash !== undefined) $set.passwordHash = data.passwordHash;
+
+    if (Object.keys($set).length === 0) return this.findById(id);
+
+    const doc = await UserModel.findByIdAndUpdate(id, { $set }, { new: true }).select('+passwordHash');
+    return doc ? toDomain(doc) : null;
+  }
+
+  async countByRole(role: UserRole, filter: { isActive?: boolean } = {}): Promise<number> {
+    const query: Record<string, unknown> = { role };
+    if (filter.isActive !== undefined) query.isActive = filter.isActive;
+    return UserModel.countDocuments(query);
   }
 }
 

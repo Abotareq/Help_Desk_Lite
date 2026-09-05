@@ -42,6 +42,8 @@ npm run seed
 | GET | `/api/users/me` | any signed-in user | The caller's own profile |
 | POST | `/api/users` | MANAGER | Create a user and set their role |
 | GET | `/api/users` | MANAGER, AGENT | List users, filterable by `role` and `isActive` |
+| PATCH | `/api/users/:id` | MANAGER | Rename, change role, deactivate or reactivate |
+| POST | `/api/users/:id/password` | MANAGER | Reset someone's password |
 | POST | `/api/requests` | any signed-in user | Submit a support request |
 | GET | `/api/requests/:id` | requester, assignee, manager | Read one request |
 | GET | `/api/requests/mine` | AGENT, MANAGER | The caller's own queue, highest priority first |
@@ -63,6 +65,30 @@ Authenticated calls send `Authorization: Bearer <token>`.
 | `MANAGER` | Everything an agent can, plus see all requests, assign work, manage accounts |
 
 There is no public registration in v1: managers create accounts and set roles.
+
+## Account administration
+
+A manager can rename an account, move someone between roles, deactivate a leaver and
+reactivate them, and reset a password — there is no self-service recovery in v1. Email is
+not editable: it is the account's identity and what the audit trail reads against.
+
+Two guards exist so the system cannot be locked out of itself. A manager cannot deactivate
+their own account or drop their own manager role, and the last *active* manager can be
+neither deactivated nor demoted. Deactivated managers do not count as cover.
+
+Deactivating someone — or demoting a handler to `EMPLOYEE` — does not delete their requests
+or touch the history. It does return the open requests that change leaves without a usable
+owner:
+
+```json
+{
+  "user": { "id": "652f...", "isActive": false },
+  "orphanedRequests": [{ "id": "6530...", "reference": "HD-000042", "status": "IN_PROGRESS" }]
+}
+```
+
+It warns rather than blocking: the change goes through, and the manager finds out at that
+moment rather than when a requester chases an untouched ticket weeks later.
 
 ## Requests
 

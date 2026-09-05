@@ -1,6 +1,11 @@
 import type { User } from '../../src/domain/entities/User';
 import type { UserRole } from '../../src/domain/enums/UserRole';
-import type { CreateUserData, IUserRepository, ListUsersFilter } from '../../src/domain/interfaces/IUserRepository';
+import type {
+  CreateUserData,
+  IUserRepository,
+  ListUsersFilter,
+  UpdateUserData,
+} from '../../src/domain/interfaces/IUserRepository';
 
 /**
  * In-memory stand-in for IUserRepository. Unit tests use this instead of a
@@ -34,8 +39,23 @@ export class FakeUserRepository implements IUserRepository {
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  async countByRole(role: UserRole): Promise<number> {
-    return [...this.users.values()].filter((u) => u.role === role).length;
+  async update(id: string, data: UpdateUserData): Promise<User | null> {
+    const existing = this.users.get(id);
+    if (!existing) return null;
+
+    if (data.name !== undefined) existing.name = data.name;
+    if (data.role !== undefined) existing.role = data.role;
+    if (data.isActive !== undefined) existing.isActive = data.isActive;
+    if (data.passwordHash !== undefined) existing.passwordHash = data.passwordHash;
+    existing.updatedAt = new Date();
+
+    return { ...existing };
+  }
+
+  async countByRole(role: UserRole, filter: { isActive?: boolean } = {}): Promise<number> {
+    return [...this.users.values()].filter(
+      (u) => u.role === role && (filter.isActive === undefined || u.isActive === filter.isActive),
+    ).length;
   }
 
   /** Test helper — not part of the interface. */
