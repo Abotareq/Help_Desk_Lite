@@ -76,9 +76,12 @@ what is deliberately deferred.
 
 ## frontend/
 
-The web client. React 19 + Vite. Currently the starter scaffold — the interfaces described
-in the PRD (submission form, requester's request list, handler queue, manager dashboard) are
-not built yet.
+The web client. React 19 + Vite + TypeScript, strict mode on. Currently the starter scaffold
+— the interfaces described in the PRD (submission form, requester's request list, handler
+queue, manager dashboard) are not built yet.
+
+`npm run build --workspace frontend` typechecks before it bundles, so a type error fails the
+build rather than shipping. `npm run typecheck --workspace frontend` runs the check alone.
 
 ## Continuous integration
 
