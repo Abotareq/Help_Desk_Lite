@@ -76,12 +76,37 @@ what is deliberately deferred.
 
 ## frontend/
 
-The web client. React 19 + Vite + TypeScript, strict mode on. Currently the starter scaffold
-— the interfaces described in the PRD (submission form, requester's request list, handler
-queue, manager dashboard) are not built yet.
+The web client. React 19 + Vite + TypeScript (strict), Tailwind CSS, TanStack Query and React
+Router. Visually modelled on [Frappe Helpdesk](https://frappe.io/helpdesk): light, dense,
+minimal chrome, colour reserved for status.
+
+Built as micro-components — small single-responsibility pieces in `components/ui/` composed
+upward, so a primitive is defined once and reused rather than restyled per screen.
+
+```
+frontend/src/
+├── api/          typed client, one module per resource
+├── components/   ui/ primitives and layout/ shell
+├── features/     auth (and a folder per feature slice as they land)
+├── hooks/
+├── lib/          cn, time, status presentation, the workflow mirror
+├── routes/
+└── types/        the API contract, mirrored
+```
+
+The sign-in page and app shell are in place; the four PRD screens land in their own
+increments. Dev requests proxy to the API on :3000, so the browser stays on one origin and
+no API host is baked into the bundle.
 
 `npm run build --workspace frontend` typechecks before it bundles, so a type error fails the
-build rather than shipping. `npm run typecheck --workspace frontend` runs the check alone.
+build rather than shipping.
+
+### The workflow mirror
+
+`lib/workflow.ts` copies the backend's transition table so the UI never *offers* a control
+the API would refuse. `lib/workflow.test.ts` imports the backend table directly across the
+workspace and asserts the two agree — nothing else would notice them drifting apart, because
+both halves would still "work" and the user would just get a surprise 422.
 
 ## Continuous integration
 
