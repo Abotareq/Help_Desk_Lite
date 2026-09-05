@@ -3,39 +3,89 @@
  * POST /api/users by a manager, so without this there is no way in.
  *
  *   npm run seed
+ *
+ * The logic is split from the CLI wiring so it can be tested: importing this
+ * module has no side effects, and `main()` only runs when it is the entry point.
  */
 import { UserService } from '../src/application/services/UserService';
 import { connectDatabase, disconnectDatabase } from '../src/config/database';
 import { env } from '../src/config/env';
 import { UserRole } from '../src/domain/enums/UserRole';
+import type { PublicUser } from '../src/domain/entities/User';
+import type { IUserRepository } from '../src/domain/interfaces/IUserRepository';
 import { MongoUserRepository } from '../src/infrastructure/repositories/MongoUserRepository';
 
-async function seed(): Promise<void> {
-  const email = process.env.SEED_MANAGER_EMAIL;
-  const password = process.env.SEED_MANAGER_PASSWORD;
-  const name = process.env.SEED_MANAGER_NAME ?? 'Bootstrap Manager';
+export interface SeedConfig {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface SeedResult {
+  /** False when a manager with that email was already present. */
+  created: boolean;
+  user: PublicUser;
+}
+
+/** Reads and validates the seed configuration, failing loudly rather than seeding a blank account. */
+export function readSeedConfig(source: NodeJS.ProcessEnv = process.env): SeedConfig {
+  const email = source.SEED_MANAGER_EMAIL;
+  const password = source.SEED_MANAGER_PASSWORD;
 
   if (!email || !password) {
     throw new Error('Set SEED_MANAGER_EMAIL and SEED_MANAGER_PASSWORD before seeding');
   }
 
-  await connectDatabase(env.MONGODB_URI);
-
-  const repository = new MongoUserRepository();
-  const service = new UserService(repository);
-
-  const existing = await repository.findByEmail(email);
-  if (existing) {
-    console.log(`Manager ${email} already exists — nothing to do.`);
-  } else {
-    const user = await service.createUser({ email, name, password, role: UserRole.MANAGER });
-    console.log(`Created manager ${user.email} (${user.id})`);
-  }
-
-  await disconnectDatabase();
+  return { email, password, name: source.SEED_MANAGER_NAME ?? 'Bootstrap Manager' };
 }
 
-seed().catch((err) => {
-  console.error('Seed failed:', err);
-  process.exit(1);
-});
+/**
+ * Idempotent: running it twice leaves one manager, not two. A seed that fails
+ * on a second run is a seed nobody dares re-run.
+ */
+export async function seedBootstrapManager(
+  users: IUserRepository,
+  config: SeedConfig,
+): Promise<SeedResult> {
+  const service = new UserService(users);
+
+  const existing = await users.findByEmail(config.email);
+  if (existing) {
+    const { passwordHash: _passwordHash, ...publicUser } = existing;
+    return { created: false, user: publicUser };
+  }
+
+  const user = await service.createUser({
+    email: config.email,
+    name: config.name,
+    password: config.password,
+    role: UserRole.MANAGER,
+  });
+
+  return { created: true, user };
+}
+
+async function main(): Promise<void> {
+  const config = readSeedConfig();
+
+  await connectDatabase(env.MONGODB_URI);
+  try {
+    const { created, user } = await seedBootstrapManager(new MongoUserRepository(), config);
+    // eslint-disable-next-line no-console
+    console.log(
+      created
+        ? `Created manager ${user.email} (${user.id})`
+        : `Manager ${user.email} already exists — nothing to do.`,
+    );
+  } finally {
+    await disconnectDatabase();
+  }
+}
+
+if (require.main === module) {
+  main().catch((err) => {
+    // eslint-disable-next-line no-console
+    console.error('Seed failed:', err);
+    process.exit(1);
+  });
+}
