@@ -20,12 +20,12 @@ export type Env = z.infer<typeof EnvSchema>;
  * Tests never touch a real deployment, so they get safe placeholders —
  * the in-memory Mongo server hands the real URI to connectDatabase directly.
  */
-function loadEnv(): Env {
-  const isTest = process.env.NODE_ENV === 'test';
+export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
+  const isTest = source.NODE_ENV === 'test';
   const raw = {
-    ...process.env,
-    MONGODB_URI: process.env.MONGODB_URI ?? (isTest ? 'mongodb://127.0.0.1:27017/helpdesk_test' : undefined),
-    JWT_SECRET: process.env.JWT_SECRET ?? (isTest ? 'test-secret-value-not-for-production' : undefined),
+    ...source,
+    MONGODB_URI: source.MONGODB_URI ?? (isTest ? 'mongodb://127.0.0.1:27017/helpdesk_test' : undefined),
+    JWT_SECRET: source.JWT_SECRET ?? (isTest ? 'test-secret-value-not-for-production' : undefined),
   };
 
   const parsed = EnvSchema.safeParse(raw);
