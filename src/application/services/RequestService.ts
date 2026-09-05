@@ -1,11 +1,16 @@
 import type { RequestHistoryEntry, SupportRequest } from '../../domain/entities/Request';
-import { RequestStatus } from '../../domain/enums/RequestStatus';
+import { OPEN_STATUSES, REQUEST_STATUSES, RequestStatus } from '../../domain/enums/RequestStatus';
 import { UserRole, isHandlerRole } from '../../domain/enums/UserRole';
-import type { IRequestRepository, PaginatedRequests } from '../../domain/interfaces/IRequestRepository';
+import type {
+  IRequestRepository,
+  PaginatedRequests,
+  RequestQuery,
+} from '../../domain/interfaces/IRequestRepository';
 import type { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { ActorRelation, findTransition, nextStatuses } from '../../domain/workflow/transitions';
 import { AppError } from '../../shared/AppError';
 import type { CreateRequestInput } from '../dtos/CreateRequestSchema';
+import type { ListRequestsQuery, RequestStatsQuery } from '../dtos/ListRequestsSchema';
 import type { UpdateStatusInput } from '../dtos/UpdateStatusSchema';
 
 /** Who is acting, as far as the service is concerned. */
@@ -17,6 +22,15 @@ export interface Actor {
 export interface ListMyRequestsOptions {
   page?: number;
   limit?: number;
+}
+
+/** The manager dashboard payload: aggregate counts alongside the raw list. */
+export interface RequestStats {
+  total: number;
+  open: number;
+  unassigned: number;
+  byStatus: Record<RequestStatus, number>;
+  byAssignee: { assigneeId: string | null; count: number }[];
 }
 
 export class RequestService {
@@ -127,6 +141,85 @@ export class RequestService {
       sortBy: 'priority',
       sortDir: 'desc',
     });
+  }
+
+  /**
+   * The manager view, and the only place requests are listed in bulk.
+   *
+   * Filters and visibility are deliberately separate: the caller controls the
+   * filters, the viewer's role controls the scope, and scope is applied on top
+   * so no combination of query parameters can widen what someone may see.
+   */
+  async listRequests(query: ListRequestsQuery, actor: Actor): Promise<PaginatedRequests> {
+    return this.requests.search({
+      ...this.toRepositoryQuery(query, actor),
+      page: query.page,
+      limit: query.limit,
+      sortBy: query.sortBy,
+      sortDir: query.sortDir,
+    });
+  }
+
+  /**
+   * What managers need to see, resolved from the PRD: both the raw list and the
+   * counts, since "how much is open" and "what exactly is stuck" are different
+   * questions and v1 has no separate reporting module to answer either.
+   */
+  async getStats(query: RequestStatsQuery, actor: Actor): Promise<RequestStats> {
+    const scoped = this.toRepositoryQuery(query, actor);
+
+    const [byStatusRows, byAssignee] = await Promise.all([
+      this.requests.countByStatus(scoped),
+      this.requests.countByAssignee(scoped),
+    ]);
+
+    // Every status is present, including the zeroes — a dashboard with columns
+    // appearing and disappearing as work moves is worse than useless.
+    const byStatus = REQUEST_STATUSES.reduce<Record<RequestStatus, number>>(
+      (acc, status) => {
+        acc[status] = byStatusRows.find((row) => row.status === status)?.count ?? 0;
+        return acc;
+      },
+      {} as Record<RequestStatus, number>,
+    );
+
+    const total = Object.values(byStatus).reduce((sum, count) => sum + count, 0);
+    const open = OPEN_STATUSES.reduce((sum, status) => sum + byStatus[status], 0);
+    const unassigned = byAssignee.find((row) => row.assigneeId === null)?.count ?? 0;
+
+    return { total, open, unassigned, byStatus, byAssignee };
+  }
+
+  /**
+   * Translates the HTTP-shaped filters into a repository query, then narrows it
+   * to what this viewer is allowed to see. Both list and stats go through here,
+   * so the two can never disagree about scope.
+   */
+  private toRepositoryQuery(
+    query: ListRequestsQuery | RequestStatsQuery,
+    actor: Actor,
+  ): RequestQuery {
+    const repoQuery: RequestQuery = {};
+
+    if (query.status) repoQuery.status = query.status;
+    if (query.category) repoQuery.category = query.category;
+    if (query.priority) repoQuery.priority = query.priority;
+    if (query.requester) repoQuery.requesterId = query.requester;
+    if (query.assignee !== undefined) {
+      repoQuery.assigneeId = query.assignee === 'unassigned' ? null : query.assignee;
+    }
+
+    switch (actor.role) {
+      case UserRole.MANAGER:
+        break;
+      case UserRole.AGENT:
+        repoQuery.visibleTo = { assigneeIdOrUnassigned: actor.id };
+        break;
+      default:
+        repoQuery.visibleTo = { requesterId: actor.id };
+    }
+
+    return repoQuery;
   }
 
   /**

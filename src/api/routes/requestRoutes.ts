@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AssignRequestSchema, ListMyRequestsSchema } from '../../application/dtos/AssignRequestSchema';
 import { CreateRequestSchema, RequestIdSchema } from '../../application/dtos/CreateRequestSchema';
+import { ListRequestsSchema, RequestStatsSchema } from '../../application/dtos/ListRequestsSchema';
 import { UpdateStatusSchema } from '../../application/dtos/UpdateStatusSchema';
 import { UserRole } from '../../domain/enums/UserRole';
 import { authenticate } from '../../infrastructure/middlewares/authMiddleware';
@@ -17,7 +18,13 @@ export function buildRequestRoutes(controller: RequestController): Router {
   // Anyone signed in can submit — that is the whole point of replacing email intake.
   router.post('/', validate(CreateRequestSchema), asyncHandler(controller.create));
 
-  // Declared before '/:id' so "mine" is not swallowed as a request id.
+  // Every literal path is declared before '/:id' so none is parsed as an id.
+  // The list and stats endpoints are open to any role: the service narrows the
+  // scope to what the caller may see rather than refusing them outright.
+  router.get('/', validate(ListRequestsSchema), asyncHandler(controller.list));
+
+  router.get('/stats', validate(RequestStatsSchema), asyncHandler(controller.stats));
+
   router.get(
     '/mine',
     requireRole(UserRole.AGENT, UserRole.MANAGER),
