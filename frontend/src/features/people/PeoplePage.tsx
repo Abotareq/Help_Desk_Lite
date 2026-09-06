@@ -13,6 +13,7 @@ import { useCurrentUser } from '../../hooks/useAuth'
 import { useUpdateUser, useUsers } from '../../hooks/useUsers'
 import { UserRole, type OrphanedRequest, type User } from '../../types/domain'
 import { NewUserForm } from './NewUserForm'
+import { ResetPasswordDialog } from './ResetPasswordDialog'
 
 export function PeoplePage() {
   const viewer = useCurrentUser()
@@ -20,6 +21,7 @@ export function PeoplePage() {
   const updateUser = useUpdateUser()
   const [creating, setCreating] = useState(false)
   const [orphaned, setOrphaned] = useState<OrphanedRequest[] | null>(null)
+  const [resetting, setResetting] = useState<User | null>(null)
 
   const activeManagers = (users ?? []).filter(
     (u) => u.role === UserRole.MANAGER && u.isActive,
@@ -100,6 +102,12 @@ export function PeoplePage() {
           </div>
         ) : null}
 
+        {resetting ? (
+          <div className="p-4 pb-0">
+            <ResetPasswordDialog user={resetting} onClose={() => setResetting(null)} />
+          </div>
+        ) : null}
+
         {updateUser.isError ? (
           <div className="p-4 pb-0">
             <Alert>
@@ -136,7 +144,7 @@ export function PeoplePage() {
                 <th scope="col" className="w-24 py-2 pr-3 font-medium">
                   Status
                 </th>
-                <th scope="col" className="w-32 py-2 pr-4 font-medium" />
+                <th scope="col" className="w-56 py-2 pr-4 font-medium" />
               </tr>
             </thead>
             <tbody>
@@ -180,6 +188,15 @@ export function PeoplePage() {
                     )}
                   </td>
                   <td className="py-2 pr-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={updateUser.isPending}
+                        onClick={() => setResetting(user)}
+                      >
+                        Reset password
+                      </Button>
                     {canDeactivate(user) ? (
                       <Button
                         size="sm"
@@ -201,6 +218,7 @@ export function PeoplePage() {
                         {user.id === viewer.id ? 'You' : 'Last manager'}
                       </span>
                     )}
+                    </div>
                   </td>
                 </tr>
               ))}
