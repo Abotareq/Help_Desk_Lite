@@ -102,7 +102,7 @@ All four PRD interfaces are in place, plus sign-in:
 | Queue — my work and the unclaimed pool | AGENT, MANAGER |
 | All requests — filterable, paginated | MANAGER |
 | Dashboard — counts and workload | MANAGER |
-| People — accounts, roles, deactivation | MANAGER |
+| People — accounts, roles, deactivation, password reset | MANAGER |
 
 Restricted routes are gated as well as hidden from the sidebar: filtering the nav only
 removes the link. Dev requests proxy to the API on :3000, so the browser stays on one origin and
@@ -110,6 +110,13 @@ no API host is baked into the bundle.
 
 `npm run build --workspace frontend` typechecks before it bundles, so a type error fails the
 build rather than shipping.
+
+### Testing
+
+Vitest with Testing Library, in a jsdom environment. The suite covers the workflow mirror,
+the API client, route role-gating, `StatusActions`, the submission form, password reset and
+the shared primitives — the pieces where a regression would otherwise be invisible until
+someone noticed by hand.
 
 ### The workflow mirror
 
