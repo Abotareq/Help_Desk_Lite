@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { ApiError } from '../../api/client'
+import { AssignControl } from '../../components/requests/AssignControl'
 import { HistoryTimeline } from '../../components/requests/HistoryTimeline'
 import { StatusActions } from '../../components/requests/StatusActions'
 import { Alert } from '../../components/ui/Alert'
@@ -16,6 +17,7 @@ import { useClaimRequest, useRequest, useUpdateStatus } from '../../hooks/useReq
 import { useUserNames } from '../../hooks/useUserNames'
 import { formatDateTime } from '../../lib/time'
 import { canClaim } from '../../lib/workflow'
+import { UserRole } from '../../types/domain'
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -140,6 +142,12 @@ export function RequestDetailPage() {
                 <Field label="Category">
                   <Badge>{request.category}</Badge>
                 </Field>
+                {viewer.role === UserRole.MANAGER ? (
+                  <div className="px-4 py-2">
+                    <p className="mb-1.5 text-sm text-ink-muted">Assigned to</p>
+                    <AssignControl request={request} />
+                  </div>
+                ) : (
                 <Field label="Assigned to">
                   {assigneeName ? (
                     <span className="inline-flex items-center gap-1.5">
@@ -152,6 +160,7 @@ export function RequestDetailPage() {
                     <span className="text-ink-subtle">Unclaimed</span>
                   )}
                 </Field>
+                )}
                 <Field label="Submitted">{formatDateTime(request.createdAt)}</Field>
                 {request.resolvedAt ? (
                   <Field label="Resolved">{formatDateTime(request.resolvedAt)}</Field>
