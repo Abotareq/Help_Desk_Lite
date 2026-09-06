@@ -12,9 +12,10 @@ import { PriorityBadge } from '../../components/ui/PriorityBadge'
 import { Spinner } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { useCurrentUser } from '../../hooks/useAuth'
-import { useRequest, useUpdateStatus } from '../../hooks/useRequests'
+import { useClaimRequest, useRequest, useUpdateStatus } from '../../hooks/useRequests'
 import { useUserNames } from '../../hooks/useUserNames'
 import { formatDateTime } from '../../lib/time'
+import { canClaim } from '../../lib/workflow'
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -30,6 +31,7 @@ export function RequestDetailPage() {
   const viewer = useCurrentUser()
   const { data: request, isPending, error } = useRequest(id)
   const updateStatus = useUpdateStatus(id)
+  const claim = useClaimRequest()
 
   // Every id the page needs a name for: whoever acted, plus the current owner.
   const names = useUserNames(
@@ -103,7 +105,17 @@ export function RequestDetailPage() {
               <CardHeader>
                 <CardTitle>Actions</CardTitle>
               </CardHeader>
-              <div className="px-4 py-3">
+              <div className="space-y-3 px-4 py-3">
+                {canClaim(request, viewer) ? (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    loading={claim.isPending}
+                    onClick={() => claim.mutate(request.id)}
+                  >
+                    Claim this request
+                  </Button>
+                ) : null}
                 <StatusActions
                   request={request}
                   viewer={viewer}
