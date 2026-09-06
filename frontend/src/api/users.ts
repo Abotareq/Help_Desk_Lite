@@ -10,6 +10,11 @@ export function listUsers(filter: { role?: UserRole; isActive?: boolean } = {}):
   }).then((r) => r.users)
 }
 
+/** One colleague by id — available to any signed-in user, unlike listing. */
+export function fetchUser(id: string): Promise<User> {
+  return apiFetch<{ user: User }>(`/users/${id}`).then((r) => r.user)
+}
+
 export interface CreateUserInput {
   email: string
   name: string

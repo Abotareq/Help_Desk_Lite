@@ -320,7 +320,10 @@ export class RequestService {
       fromStatus: request.status,
       toStatus: nextStatus,
       actorId: actor.id,
-      note: assigneeId === null ? 'Returned to the unclaimed queue' : `Assigned to ${assigneeId}`,
+      // No note on an assignment: the entry's type and the request's assignee
+      // already say what happened, and a note is user-facing text — it has no
+      // business carrying a raw database id.
+      ...(assigneeId === null ? { note: 'Returned to the unclaimed queue' } : {}),
       at: new Date(),
     };
 

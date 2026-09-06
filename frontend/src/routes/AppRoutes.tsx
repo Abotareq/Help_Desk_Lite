@@ -2,6 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
 import { ProtectedRoute } from '../features/auth/ProtectedRoute'
 import { SignInPage } from '../features/auth/SignInPage'
+import { MyRequestsPage } from '../features/requests/MyRequestsPage'
+import { NewRequestPage } from '../features/requests/NewRequestPage'
+import { RequestDetailPage } from '../features/requests/RequestDetailPage'
 import { UserRole } from '../types/domain'
 import { PlaceholderPage } from './PlaceholderPage'
 
@@ -20,7 +23,10 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<PlaceholderPage title="My requests" />} />
+        <Route index element={<MyRequestsPage />} />
+        <Route path="requests/new" element={<NewRequestPage />} />
+        {/* Declared after /new so the literal path is not read as an id. */}
+        <Route path="requests/:id" element={<RequestDetailPage />} />
 
         {/*
           Every restricted route is gated here as well as hidden from the
