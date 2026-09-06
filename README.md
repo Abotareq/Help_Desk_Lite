@@ -94,8 +94,18 @@ frontend/src/
 └── types/        the API contract, mirrored
 ```
 
-Sign-in, the app shell, the employee views (submit, track, request detail) and the handler
-queue are in place. The manager dashboard and user administration land next. Dev requests proxy to the API on :3000, so the browser stays on one origin and
+All four PRD interfaces are in place, plus sign-in:
+
+| Screen | Who |
+| --- | --- |
+| My requests · New request · Request detail | everyone |
+| Queue — my work and the unclaimed pool | AGENT, MANAGER |
+| All requests — filterable, paginated | MANAGER |
+| Dashboard — counts and workload | MANAGER |
+| People — accounts, roles, deactivation | MANAGER |
+
+Restricted routes are gated as well as hidden from the sidebar: filtering the nav only
+removes the link. Dev requests proxy to the API on :3000, so the browser stays on one origin and
 no API host is baked into the bundle.
 
 `npm run build --workspace frontend` typechecks before it bundles, so a type error fails the

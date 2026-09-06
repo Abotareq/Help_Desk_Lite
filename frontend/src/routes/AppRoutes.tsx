@@ -2,12 +2,14 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
 import { ProtectedRoute } from '../features/auth/ProtectedRoute'
 import { SignInPage } from '../features/auth/SignInPage'
+import { DashboardPage } from '../features/dashboard/DashboardPage'
+import { PeoplePage } from '../features/people/PeoplePage'
+import { AllRequestsPage } from '../features/requests/AllRequestsPage'
 import { MyRequestsPage } from '../features/requests/MyRequestsPage'
 import { NewRequestPage } from '../features/requests/NewRequestPage'
 import { QueuePage } from '../features/requests/QueuePage'
 import { RequestDetailPage } from '../features/requests/RequestDetailPage'
 import { UserRole } from '../types/domain'
-import { PlaceholderPage } from './PlaceholderPage'
 
 const HANDLER_ROLES = [UserRole.AGENT, UserRole.MANAGER]
 const MANAGER_ONLY = [UserRole.MANAGER]
@@ -47,7 +49,7 @@ export function AppRoutes() {
           path="all"
           element={
             <ProtectedRoute roles={MANAGER_ONLY}>
-              <PlaceholderPage title="All requests" />
+              <AllRequestsPage />
             </ProtectedRoute>
           }
         />
@@ -55,7 +57,7 @@ export function AppRoutes() {
           path="dashboard"
           element={
             <ProtectedRoute roles={MANAGER_ONLY}>
-              <PlaceholderPage title="Dashboard" />
+              <DashboardPage />
             </ProtectedRoute>
           }
         />
@@ -63,7 +65,7 @@ export function AppRoutes() {
           path="people"
           element={
             <ProtectedRoute roles={MANAGER_ONLY}>
-              <PlaceholderPage title="People" />
+              <PeoplePage />
             </ProtectedRoute>
           }
         />
