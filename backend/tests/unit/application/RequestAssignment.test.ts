@@ -51,6 +51,15 @@ describe('RequestService assignment', () => {
       expect(claimed.status).toBe(RequestStatus.IN_PROGRESS);
     });
 
+    it('does not put a raw user id into the user-facing note', async () => {
+      const claimed = await service.claimRequest(requestId, agentOne);
+      const last = claimed.history[claimed.history.length - 1];
+
+      // History notes are shown to requesters. An ObjectId in one is leaked
+      // plumbing, not information.
+      expect(last?.note).toBeUndefined();
+    });
+
     it('records the claim in the history', async () => {
       const claimed = await service.claimRequest(requestId, agentOne);
       const last = claimed.history[claimed.history.length - 1];

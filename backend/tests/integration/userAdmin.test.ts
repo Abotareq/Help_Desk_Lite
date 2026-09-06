@@ -241,3 +241,39 @@ describe('POST /api/users/:id/password', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('GET /api/users/:id', () => {
+  // The PRD's requester "wants to know who's handling it". Listing users is
+  // staff-only, so without this endpoint an employee could never resolve the
+  // name of the person working their request.
+  it('lets an employee look up the handler assigned to their request', async () => {
+    const res = await authed(app, employee).get(`/api/users/${agent.id}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.user).toMatchObject({ id: agent.id, role: UserRole.AGENT });
+  });
+
+  it('never returns the password hash', async () => {
+    const res = await authed(app, employee).get(`/api/users/${agent.id}`);
+
+    expect(res.body.user).not.toHaveProperty('passwordHash');
+  });
+
+  it('requires authentication', async () => {
+    const res = await request(app).get(`/api/users/${agent.id}`);
+
+    expect(res.status).toBe(401);
+  });
+
+  it('404s an unknown id', async () => {
+    const res = await authed(app, employee).get('/api/users/000000000000000000000099');
+
+    expect(res.status).toBe(404);
+  });
+
+  it('404s a malformed id rather than throwing a cast error', async () => {
+    const res = await authed(app, employee).get('/api/users/not-an-id');
+
+    expect(res.status).toBe(404);
+  });
+});

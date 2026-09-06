@@ -46,6 +46,7 @@ npm run seed
 | GET | `/api/users/me` | any signed-in user | The caller's own profile |
 | POST | `/api/users` | MANAGER | Create a user and set their role |
 | GET | `/api/users` | MANAGER, AGENT | List users, filterable by `role` and `isActive` |
+| GET | `/api/users/:id` | any signed-in user | One colleague, so a requester can see who is handling their request |
 | PATCH | `/api/users/:id` | MANAGER | Rename, change role, deactivate or reactivate |
 | POST | `/api/users/:id/password` | MANAGER | Reset someone's password |
 | POST | `/api/requests` | any signed-in user | Submit a support request |

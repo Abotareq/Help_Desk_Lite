@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { CreateUserSchema, ListUsersSchema } from '../../application/dtos/CreateUserSchema';
 import { LoginSchema } from '../../application/dtos/LoginSchema';
-import { ResetPasswordSchema, UpdateUserSchema } from '../../application/dtos/UpdateUserSchema';
+import { ResetPasswordSchema, UpdateUserSchema, UserIdSchema } from '../../application/dtos/UpdateUserSchema';
 import { UserRole } from '../../domain/enums/UserRole';
 import { authenticate } from '../../infrastructure/middlewares/authMiddleware';
 import { requireRole } from '../../infrastructure/middlewares/roleMiddleware';
@@ -23,6 +23,12 @@ export function buildUserRoutes(controller: UserController): Router {
   router.use(authenticate);
 
   router.get('/me', asyncHandler(controller.me));
+
+  // Any signed-in user may look up one colleague by id. The PRD's requester
+  // "wants to know who's handling it", and without this they cannot: listing
+  // users is staff-only, so a name would never resolve. Declared after '/me' so
+  // the literal path is not read as an id.
+  router.get('/:id', validate(UserIdSchema), asyncHandler(controller.getUser))
 
   router.post(
     '/',

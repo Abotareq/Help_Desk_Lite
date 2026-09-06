@@ -40,3 +40,9 @@ export const ResetPasswordSchema = z.object({
 });
 
 export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>['body'];
+
+export const UserIdSchema = z.object({
+  params: z.object({
+    id: z.string().min(1, 'A user id is required'),
+  }),
+});
