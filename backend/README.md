@@ -42,7 +42,7 @@ npm run seed
 | Method | Path | Who | What |
 | --- | --- | --- | --- |
 | GET | `/health` | anyone | Liveness check |
-| POST | `/api/auth/login` | anyone | Exchange email + password for a JWT |
+| POST | `/api/auth/login` | anyone | Exchange email + password for a JWT (throttled) |
 | GET | `/api/users/me` | any signed-in user | The caller's own profile |
 | POST | `/api/users` | MANAGER | Create a user and set their role |
 | GET | `/api/users` | MANAGER, AGENT | List users, filterable by `role` and `isActive` |
@@ -60,6 +60,24 @@ npm run seed
 | GET | `/api/requests/stats` | any signed-in user, scoped | Dashboard counts |
 
 Authenticated calls send `Authorization: Bearer <token>`.
+
+## Sign-in throttling
+
+`POST /api/auth/login` allows 10 **failed** attempts per IP per 15 minutes by default
+(`LOGIN_RATE_LIMIT_MAX`, `LOGIN_RATE_LIMIT_WINDOW_MS`), then returns 429 in the usual error
+envelope.
+
+Keyed by IP rather than by email: keying on the address would let anyone lock a colleague
+out of their own account by failing that login enough times. Successful sign-ins are not
+counted, so a shared office address does not throttle itself.
+
+Set `TRUST_PROXY_HOPS` if you deploy behind a reverse proxy — otherwise every request looks
+like it comes from the proxy and the limit applies to all traffic at once. It defaults to 0
+because trusting `X-Forwarded-For` when nothing sets it would let a caller spoof past the
+limit.
+
+The store is in-memory, so the limit is per process. Running more than one instance needs a
+shared store.
 
 ## Roles
 
