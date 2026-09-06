@@ -1,7 +1,7 @@
 {
   "name": "helpdesk-lite-api",
   "version": "1.0.0",
-  "description": "HelpDesk Lite \u2014 internal support ticketing API (Node + Express + MongoDB + TypeScript)",
+  "description": "HelpDesk Lite — internal support ticketing API (Node + Express + MongoDB + TypeScript)",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
@@ -28,6 +28,7 @@
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.2",
+    "express-rate-limit": "^8.7.0",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.24.4",
