@@ -235,6 +235,17 @@ src/
 Mongo exists — services are written against the repository interfaces, which is also the seam
 unit tests substitute fakes at.
 
+## Pinned dependencies
+
+**Express 4, deliberately.** npm silently rewrote this to `^5` during an unrelated install
+once, and nothing caught it: the lockfile changed, the suite still passed, and a local
+verification ran against a different major than the one committed. Express 5 changes error
+handling and routing behaviour, so moving to it is a migration to do on purpose.
+
+`tests/unit/dependencies.test.ts` asserts both the declared range and the version actually
+resolved at runtime. If you upgrade intentionally, change that test in the same commit —
+the friction is the point.
+
 ## Testing
 
 - **Unit** (`tests/unit/`) — services against hand-rolled fakes of the repository interfaces.
