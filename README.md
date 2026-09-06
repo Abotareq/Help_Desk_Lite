@@ -94,8 +94,8 @@ frontend/src/
 └── types/        the API contract, mirrored
 ```
 
-The sign-in page and app shell are in place; the four PRD screens land in their own
-increments. Dev requests proxy to the API on :3000, so the browser stays on one origin and
+Sign-in, the app shell, the employee views (submit, track, request detail) and the handler
+queue are in place. The manager dashboard and user administration land next. Dev requests proxy to the API on :3000, so the browser stays on one origin and
 no API host is baked into the bundle.
 
 `npm run build --workspace frontend` typechecks before it bundles, so a type error fails the

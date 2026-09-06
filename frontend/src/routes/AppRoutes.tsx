@@ -4,6 +4,7 @@ import { ProtectedRoute } from '../features/auth/ProtectedRoute'
 import { SignInPage } from '../features/auth/SignInPage'
 import { MyRequestsPage } from '../features/requests/MyRequestsPage'
 import { NewRequestPage } from '../features/requests/NewRequestPage'
+import { QueuePage } from '../features/requests/QueuePage'
 import { RequestDetailPage } from '../features/requests/RequestDetailPage'
 import { UserRole } from '../types/domain'
 import { PlaceholderPage } from './PlaceholderPage'
@@ -38,7 +39,7 @@ export function AppRoutes() {
           path="queue"
           element={
             <ProtectedRoute roles={HANDLER_ROLES}>
-              <PlaceholderPage title="Queue" />
+              <QueuePage />
             </ProtectedRoute>
           }
         />

@@ -25,3 +25,13 @@ export const STATUS_ORDER: RequestStatus[] = [
   RequestStatus.RESOLVED,
   RequestStatus.CLOSED,
 ]
+
+/**
+ * Statuses that still need someone's attention. Mirrors OPEN_STATUSES in the
+ * backend enum — a queue is what is left to do, not everything ever raised.
+ */
+export const OPEN_STATUSES: RequestStatus[] = [
+  RequestStatus.NEW,
+  RequestStatus.IN_PROGRESS,
+  RequestStatus.WAITING,
+]
