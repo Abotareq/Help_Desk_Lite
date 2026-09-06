@@ -9,6 +9,19 @@ const EnvSchema = z.object({
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
   JWT_EXPIRES_IN: z.string().default('12h'),
+
+  /** Sign-in throttling. Defaults to 10 failed attempts per 15 minutes, per IP. */
+  LOGIN_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(15 * 60 * 1000),
+  LOGIN_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
+
+  /**
+   * How many reverse proxies sit in front of this. Rate limiting keys on the
+   * client IP, and behind a proxy every request appears to come from the proxy
+   * unless Express is told how far to look back through X-Forwarded-For.
+   * Left at 0 because trusting a header nobody sets is worse than not trusting
+   * one at all — it would let a caller spoof their way past the limit.
+   */
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).default(0),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

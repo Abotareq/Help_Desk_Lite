@@ -5,14 +5,25 @@ import { ResetPasswordSchema, UpdateUserSchema, UserIdSchema } from '../../appli
 import { UserRole } from '../../domain/enums/UserRole';
 import { authenticate } from '../../infrastructure/middlewares/authMiddleware';
 import { requireRole } from '../../infrastructure/middlewares/roleMiddleware';
+import {
+  createLoginRateLimiter,
+  type RateLimitOptions,
+} from '../../infrastructure/middlewares/rateLimiter';
 import { validate } from '../../infrastructure/middlewares/validate';
 import { asyncHandler } from '../../shared/asyncHandler';
 import type { UserController } from '../controllers/UserController';
 
-export function buildAuthRoutes(controller: UserController): Router {
+export function buildAuthRoutes(
+  controller: UserController,
+  rateLimit: RateLimitOptions | false,
+): Router {
   const router = Router();
 
-  router.post('/login', validate(LoginSchema), asyncHandler(controller.login));
+  // Throttling runs before validation: a flood of malformed bodies should cost
+  // no more to reject than a flood of well-formed guesses.
+  const throttle = rateLimit === false ? [] : [createLoginRateLimiter(rateLimit)];
+
+  router.post('/login', ...throttle, validate(LoginSchema), asyncHandler(controller.login));
 
   return router;
 }
