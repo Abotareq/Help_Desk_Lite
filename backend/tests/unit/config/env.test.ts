@@ -53,6 +53,23 @@ describe('loadEnv', () => {
   });
 
   describe('failing fast on a bad configuration', () => {
+    // The hosted deployment's dashboard calls it DATABASE_URL. Rather than
+    // rename the variable through the whole codebase and invalidate every
+    // existing local .env, the two names meet in loadEnv.
+    it('accepts DATABASE_URL as the connection string', () => {
+      const { MONGODB_URI: _omitted, ...withoutUri } = production;
+
+      const env = loadEnv({ ...withoutUri, DATABASE_URL: 'mongodb+srv://host/app' } as NodeJS.ProcessEnv);
+
+      expect(env.MONGODB_URI).toBe('mongodb+srv://host/app');
+    });
+
+    it('prefers DATABASE_URL when both are set, since the platform sets that one', () => {
+      const env = loadEnv({ ...production, DATABASE_URL: 'mongodb+srv://host/app' } as NodeJS.ProcessEnv);
+
+      expect(env.MONGODB_URI).toBe('mongodb+srv://host/app');
+    });
+
     it('refuses a missing MONGODB_URI outside tests', () => {
       const { MONGODB_URI: _omitted, ...withoutUri } = production;
 
