@@ -29,15 +29,18 @@ export function QueuePage() {
   const [tab, setTab] = useState<QueueTab>('mine')
   const claim = useClaimRequest()
 
-  // Closed work is excluded from both tabs: a queue is what still needs doing.
+  // Everything the agent owns, whatever state it is in. Work they resolved
+  // still belongs to them — it can be reopened, and it is the record of what
+  // they have done. Dropping it the moment it is fixed makes the screen lie.
   const mine = useRequestList({
     assignee: viewer.id,
-    status: [...OPEN_STATUSES],
     sortBy: 'priority',
     sortDir: 'desc',
     limit: 50,
   })
 
+  // The unclaimed pool stays open-only: a closed request nobody owns is not
+  // waiting to be picked up.
   const unclaimed = useRequestList({
     assignee: 'unassigned',
     status: [...OPEN_STATUSES],
@@ -87,7 +90,7 @@ export function QueuePage() {
           </div>
         ) : active.data.items.length === 0 ? (
           <EmptyState
-            title={tab === 'mine' ? 'Nothing assigned to you' : 'Nothing waiting to be picked up'}
+            title={tab === 'mine' ? 'You have not claimed anything yet' : 'Nothing waiting to be picked up'}
             description={
               tab === 'mine'
                 ? 'Claim something from the unclaimed tab to start working it.'

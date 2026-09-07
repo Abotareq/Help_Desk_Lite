@@ -85,7 +85,6 @@ describe('an agent', () => {
 
 describe('a manager', () => {
   it.each([
-    ['/queue', 'Queue'],
     ['/all', 'All requests'],
     ['/dashboard', 'Dashboard'],
     ['/people', 'People'],
@@ -93,6 +92,21 @@ describe('a manager', () => {
     renderAt(path, UserRole.MANAGER)
 
     expect(await screen.findByRole('heading', { name: heading })).toBeInTheDocument()
+  })
+
+  // Managers direct the work rather than doing it, so the queue is not theirs.
+  // They oversee it from All requests, filtered by owner.
+  it('is redirected away from the agents queue', async () => {
+    renderAt('/queue', UserRole.MANAGER)
+
+    expect(await screen.findByRole('heading', { name: 'My requests' })).toBeInTheDocument()
+  })
+
+  it('is not offered the Queue link', async () => {
+    renderAt('/', UserRole.MANAGER)
+    await screen.findByRole('heading', { name: 'My requests' })
+
+    expect(screen.queryByRole('link', { name: 'Queue' })).not.toBeInTheDocument()
   })
 })
 

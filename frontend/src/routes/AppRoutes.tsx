@@ -11,7 +11,8 @@ import { QueuePage } from '../features/requests/QueuePage'
 import { RequestDetailPage } from '../features/requests/RequestDetailPage'
 import { UserRole } from '../types/domain'
 
-const HANDLER_ROLES = [UserRole.AGENT, UserRole.MANAGER]
+// The queue belongs to the agents; managers oversee it from All requests.
+const AGENT_ONLY = [UserRole.AGENT]
 const MANAGER_ONLY = [UserRole.MANAGER]
 
 export function AppRoutes() {
@@ -40,7 +41,7 @@ export function AppRoutes() {
         <Route
           path="queue"
           element={
-            <ProtectedRoute roles={HANDLER_ROLES}>
+            <ProtectedRoute roles={AGENT_ONLY}>
               <QueuePage />
             </ProtectedRoute>
           }

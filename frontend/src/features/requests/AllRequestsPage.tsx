@@ -58,7 +58,7 @@ export function AllRequestsPage() {
   })
 
   const names = new Map((users ?? []).map((u) => [u.id, u.name]))
-  const handlers = (users ?? []).filter((u) => u.role !== UserRole.EMPLOYEE)
+  const handlers = (users ?? []).filter((u) => u.role === UserRole.AGENT)
   const activeFilters = ['status', 'category', 'priority', 'assignee'].filter((k) => params.get(k))
   const lastPage = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1
 
@@ -79,7 +79,7 @@ export function AllRequestsPage() {
       <div className="flex flex-wrap items-center gap-2 border-b border-line bg-canvas px-4 py-2">
         <Select
           aria-label="Filter by status"
-          className="h-7 w-auto"
+          className="h-7 w-auto min-w-32"
           value={status ?? ''}
           onChange={(e) => setFilter('status', e.target.value)}
         >
@@ -93,7 +93,7 @@ export function AllRequestsPage() {
 
         <Select
           aria-label="Filter by owner"
-          className="h-7 w-auto"
+          className="h-7 w-auto min-w-32"
           value={assignee ?? ''}
           onChange={(e) => setFilter('assignee', e.target.value)}
         >
@@ -108,7 +108,7 @@ export function AllRequestsPage() {
 
         <Select
           aria-label="Filter by category"
-          className="h-7 w-auto"
+          className="h-7 w-auto min-w-32"
           value={category ?? ''}
           onChange={(e) => setFilter('category', e.target.value)}
         >
@@ -122,7 +122,7 @@ export function AllRequestsPage() {
 
         <Select
           aria-label="Filter by priority"
-          className="h-7 w-auto"
+          className="h-7 w-auto min-w-32"
           value={priority ?? ''}
           onChange={(e) => setFilter('priority', e.target.value)}
         >

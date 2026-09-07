@@ -85,7 +85,7 @@ export function DashboardPage() {
 
       <div className="flex-1 overflow-auto bg-canvas p-4">
         <div className="mx-auto max-w-5xl space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <StatTile label="Open" value={stats.open} hint="Still needs someone" to="/all" />
             <StatTile
               label="Unclaimed"

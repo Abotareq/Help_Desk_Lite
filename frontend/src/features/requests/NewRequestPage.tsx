@@ -55,7 +55,7 @@ export function NewRequestPage() {
       <PageHeader title="New request" subtitle="Tell support what you need" />
 
       <div className="flex-1 overflow-auto bg-canvas">
-        <form onSubmit={handleSubmit} noValidate className="mx-auto max-w-2xl p-6">
+        <form onSubmit={handleSubmit} noValidate className="mx-auto max-w-2xl p-3 sm:p-6">
           <div className="space-y-4 rounded-lg border border-line bg-surface p-5">
             {/* A message with no field attached would otherwise vanish. */}
             {error && error.details.length === 0 ? <Alert>{error.message}</Alert> : null}

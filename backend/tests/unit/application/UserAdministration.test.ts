@@ -233,14 +233,16 @@ describe('UserService account administration', () => {
       expect(orphanedRequests).toEqual([]);
     });
 
-    it('reports nothing when promoting an agent to manager, who can still hold work', async () => {
+    // Managers direct the work rather than doing it, so promoting an agent
+    // strands whatever they were carrying just as deactivating them would.
+    it('reports the work stranded by promoting an agent to manager', async () => {
       const { orphanedRequests } = await service.updateUser(
         agent.id,
         { role: UserRole.MANAGER },
         manager,
       );
 
-      expect(orphanedRequests).toEqual([]);
+      expect(orphanedRequests.map((r) => r.id)).toEqual([openId]);
     });
   });
 
