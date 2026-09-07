@@ -12,6 +12,14 @@ const HISTORY_EVENT_TYPES: HistoryEventType[] = [
   'REOPENED',
 ];
 
+interface CommentSubdocument {
+  _id: Types.ObjectId;
+  authorId: Types.ObjectId;
+  body: string;
+  isInternal: boolean;
+  at: Date;
+}
+
 interface HistorySubdocument {
   type: HistoryEventType;
   fromStatus: RequestStatus | null;
@@ -33,6 +41,7 @@ export interface RequestDocument {
   requesterId: Types.ObjectId;
   assigneeId: Types.ObjectId | null;
   history: HistorySubdocument[];
+  comments: CommentSubdocument[];
   resolvedAt: Date | null;
   closedAt: Date | null;
   createdAt: Date;
@@ -51,6 +60,18 @@ const historySchema = new Schema<HistorySubdocument>(
   { _id: false },
 );
 
+// Comments carry their own _id — unlike history entries, a single one gets
+// referred to (a React key today, a notification's target tomorrow).
+const commentSchema = new Schema<CommentSubdocument>(
+  {
+    authorId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    body: { type: String, required: true, trim: true, maxlength: 5000 },
+    isInternal: { type: Boolean, required: true, default: false },
+    at: { type: Date, required: true, default: () => new Date() },
+  },
+  { _id: true },
+);
+
 const requestSchema = new Schema<RequestDocument>(
   {
     reference: { type: String, required: true, unique: true, index: true },
@@ -63,6 +84,7 @@ const requestSchema = new Schema<RequestDocument>(
     requesterId: { type: Schema.Types.ObjectId, required: true, ref: 'User', index: true },
     assigneeId: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     history: { type: [historySchema], default: [] },
+    comments: { type: [commentSchema], default: [] },
     resolvedAt: { type: Date, default: null },
     closedAt: { type: Date, default: null },
   },

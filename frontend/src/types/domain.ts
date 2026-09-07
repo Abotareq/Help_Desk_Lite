@@ -61,6 +61,21 @@ export interface RequestHistoryEntry {
   at: string
 }
 
+/**
+ * A message on a request. Deliberately not a field of SupportRequest: the API
+ * serves comments from their own endpoint so an internal note has exactly one
+ * road out, and mirroring that here keeps the two contracts the same shape.
+ */
+export interface RequestComment {
+  id: string
+  requestId: string
+  authorId: string
+  body: string
+  /** Only ever true for a viewer allowed to see it — the API filters the rest. */
+  isInternal: boolean
+  at: string
+}
+
 export interface SupportRequest {
   id: string
   reference: string

@@ -1,3 +1,4 @@
+import type { NewComment, RequestComment } from '../../src/domain/entities/Comment';
 import type { RequestHistoryEntry, SupportRequest } from '../../src/domain/entities/Request';
 import { PRIORITY_WEIGHT } from '../../src/domain/enums/RequestPriority';
 import type { RequestStatus } from '../../src/domain/enums/RequestStatus';
@@ -18,7 +19,9 @@ import type {
  */
 export class FakeRequestRepository implements IRequestRepository {
   private readonly requests = new Map<string, SupportRequest>();
+  private readonly comments = new Map<string, RequestComment[]>();
   private sequence = 0;
+  private commentSequence = 0;
 
   async create(data: CreateRequestData): Promise<SupportRequest> {
     const now = new Date();
@@ -108,6 +111,31 @@ export class FakeRequestRepository implements IRequestRepository {
     return [...tally.entries()]
       .map(([assigneeId, count]) => ({ assigneeId, count }))
       .sort((a, b) => b.count - a.count);
+  }
+
+  async addComment(requestId: string, comment: NewComment): Promise<RequestComment | null> {
+    if (!this.requests.has(requestId)) return null;
+
+    const stored: RequestComment = {
+      id: `c-${++this.commentSequence}`,
+      requestId,
+      authorId: comment.authorId,
+      body: comment.body,
+      isInternal: comment.isInternal,
+      at: comment.at,
+    };
+
+    const thread = this.comments.get(requestId) ?? [];
+    thread.push(stored);
+    this.comments.set(requestId, thread);
+
+    return { ...stored };
+  }
+
+  async listComments(requestId: string): Promise<RequestComment[]> {
+    return [...(this.comments.get(requestId) ?? [])]
+      .sort((a, b) => a.at.getTime() - b.at.getTime())
+      .map((c) => ({ ...c }));
   }
 }
 

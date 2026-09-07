@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ApiError } from '../../api/client'
+import type { StatusChange } from '../../api/requests'
 import { availableActions } from '../../lib/workflow'
 import { RequestStatus, type SupportRequest, type User } from '../../types/domain'
 import { Alert } from '../ui/Alert'
@@ -11,7 +12,24 @@ interface StatusActionsProps {
   viewer: User
   pending: boolean
   error: unknown
-  onMove: (status: RequestStatus, note?: string) => void
+  onMove: (change: StatusChange) => void
+}
+
+/**
+ * Where the text typed alongside a move ends up.
+ *
+ * On a move to WAITING it becomes a comment. "Waiting" without saying what is
+ * needed is exactly the ambiguity this tool exists to remove, and a comment is
+ * addressed to the requester and can be answered in place, where a history note
+ * is an annotation nobody can reply to. Every other move's text describes the
+ * move itself, so it stays a note.
+ */
+function asStatusChange(status: RequestStatus, text: string): StatusChange {
+  if (!text) return { status }
+
+  return status === RequestStatus.WAITING
+    ? { status, comment: { body: text } }
+    : { status, note: text }
 }
 
 /**
@@ -41,7 +59,7 @@ export function StatusActions({ request, viewer, pending, error, onMove }: Statu
 
   function confirm() {
     if (!pendingStatus) return
-    onMove(pendingStatus, note.trim() || undefined)
+    onMove(asStatusChange(pendingStatus, note.trim()))
     setPendingStatus(null)
     setNote('')
   }
@@ -75,7 +93,8 @@ export function StatusActions({ request, viewer, pending, error, onMove }: Statu
           </div>
           {pendingStatus === RequestStatus.WAITING ? (
             <p className="text-xs text-ink-subtle">
-              A request on hold without a reason is the ambiguity this tool exists to remove.
+              This goes to the requester as a comment they can answer. A request on hold without a
+              reason is the ambiguity this tool exists to remove.
             </p>
           ) : null}
         </div>

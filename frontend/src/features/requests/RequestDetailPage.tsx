@@ -1,8 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
 import { ApiError } from '../../api/client'
 import { AssignControl } from '../../components/requests/AssignControl'
-import { HistoryTimeline } from '../../components/requests/HistoryTimeline'
+import { CommentForm } from '../../components/requests/CommentForm'
 import { StatusActions } from '../../components/requests/StatusActions'
+import { Timeline } from '../../components/requests/Timeline'
 import { Alert } from '../../components/ui/Alert'
 import { Avatar } from '../../components/ui/Avatar'
 import { Badge } from '../../components/ui/Badge'
@@ -13,10 +14,16 @@ import { PriorityBadge } from '../../components/ui/PriorityBadge'
 import { Spinner } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { useCurrentUser } from '../../hooks/useAuth'
-import { useClaimRequest, useRequest, useUpdateStatus } from '../../hooks/useRequests'
+import {
+  useAddComment,
+  useClaimRequest,
+  useComments,
+  useRequest,
+  useUpdateStatus,
+} from '../../hooks/useRequests'
 import { useUserNames } from '../../hooks/useUserNames'
 import { formatDateTime } from '../../lib/time'
-import { canClaim } from '../../lib/workflow'
+import { canClaim, canComment } from '../../lib/workflow'
 import { UserRole } from '../../types/domain'
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -32,13 +39,19 @@ export function RequestDetailPage() {
   const { id = '' } = useParams()
   const viewer = useCurrentUser()
   const { data: request, isPending, error } = useRequest(id)
+  const { data: comments } = useComments(id)
   const updateStatus = useUpdateStatus(id)
+  const addComment = useAddComment(id)
   const claim = useClaimRequest()
 
-  // Every id the page needs a name for: whoever acted, plus the current owner.
+  const thread = comments ?? []
+
+  // Every id the page needs a name for: whoever acted, whoever spoke, plus the
+  // current owner.
   const names = useUserNames(
     [
       ...(request?.history.map((h) => h.actorId) ?? []),
+      ...thread.map((c) => c.authorId),
       ...(request?.assigneeId ? [request.assigneeId] : []),
     ],
     viewer,
@@ -95,10 +108,21 @@ export function RequestDetailPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>History</CardTitle>
-                <span className="text-xs text-ink-subtle">{request.history.length} events</span>
+                <CardTitle>Activity</CardTitle>
+                <span className="text-xs text-ink-subtle">
+                  {request.history.length + thread.length} entries
+                </span>
               </CardHeader>
-              <HistoryTimeline history={request.history} names={names} />
+              <Timeline history={request.history} comments={thread} names={names} />
+              {canComment(request, viewer) ? (
+                <CommentForm
+                  request={request}
+                  viewer={viewer}
+                  pending={addComment.isPending}
+                  error={addComment.error}
+                  onPost={(body, isInternal) => addComment.mutate({ body, isInternal })}
+                />
+              ) : null}
             </Card>
           </div>
 
@@ -123,7 +147,7 @@ export function RequestDetailPage() {
                   viewer={viewer}
                   pending={updateStatus.isPending}
                   error={updateStatus.error}
-                  onMove={(status, note) => updateStatus.mutate({ status, note })}
+                  onMove={(change) => updateStatus.mutate(change)}
                 />
               </div>
             </Card>

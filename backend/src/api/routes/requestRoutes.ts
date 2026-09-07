@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { AddCommentSchema } from '../../application/dtos/AddCommentSchema';
 import { AssignRequestSchema, ListMyRequestsSchema } from '../../application/dtos/AssignRequestSchema';
 import { CreateRequestSchema, RequestIdSchema } from '../../application/dtos/CreateRequestSchema';
 import { ListRequestsSchema, RequestStatsSchema } from '../../application/dtos/ListRequestsSchema';
@@ -46,6 +47,14 @@ export function buildRequestRoutes(controller: RequestController): Router {
   router.patch('/:id/status', validate(UpdateStatusSchema), asyncHandler(controller.updateStatus));
 
   router.get('/:id/history', validate(RequestIdSchema), asyncHandler(controller.getHistory));
+
+  // No role gate, for the same reason as the status route: who may join the
+  // conversation depends on their relationship to this request. There is no
+  // PATCH or DELETE here on purpose — a thread people can rewrite is not a
+  // record of what was said.
+  router.get('/:id/comments', validate(RequestIdSchema), asyncHandler(controller.listComments));
+
+  router.post('/:id/comments', validate(AddCommentSchema), asyncHandler(controller.addComment));
 
   router.patch(
     '/:id/assign',

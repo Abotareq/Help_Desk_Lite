@@ -1,3 +1,4 @@
+import type { NewComment, RequestComment } from '../../domain/entities/Comment';
 import type { RequestHistoryEntry, SupportRequest } from '../../domain/entities/Request';
 import { OPEN_STATUSES, REQUEST_STATUSES, RequestStatus } from '../../domain/enums/RequestStatus';
 import { UserRole, isHandlerRole } from '../../domain/enums/UserRole';
@@ -9,6 +10,7 @@ import type {
 import type { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { ActorRelation, findTransition, nextStatuses } from '../../domain/workflow/transitions';
 import { AppError } from '../../shared/AppError';
+import type { AddCommentInput } from '../dtos/AddCommentSchema';
 import type { CreateRequestInput } from '../dtos/CreateRequestSchema';
 import type { ListRequestsQuery, RequestStatsQuery } from '../dtos/ListRequestsSchema';
 import type { UpdateStatusInput } from '../dtos/UpdateStatusSchema';
@@ -232,7 +234,13 @@ export class RequestService {
 
     if (!canView(request, actor)) throw AppError.notFound('Request not found');
 
-    const { status: to, note } = input;
+    const { status: to, note, comment } = input;
+
+    // Checked before anything moves. A refused comment must not leave the
+    // request in its new state with the explanation missing — that is the
+    // half-done move the thread is meant to prevent.
+    if (comment) this.assertMayComment(request, actor, comment.isInternal);
+
     if (request.status === to) {
       throw AppError.unprocessable(`This request is already ${to}`);
     }
@@ -278,7 +286,80 @@ export class RequestService {
     );
     if (!updated) throw AppError.notFound('Request not found');
 
+    if (comment) await this.writeComment(request.id, comment, actor, now);
+
     return updated;
+  }
+
+  /**
+   * Post a message to a request's thread.
+   *
+   * Who may post is a relation, not a role: whoever raised it, whoever owns it,
+   * and managers. An agent looking at an unclaimed request can read the thread —
+   * they can see the request — but has nothing to say about work they have not
+   * taken, so posting is closed to them until they claim it.
+   */
+  async addComment(id: string, input: AddCommentInput, actor: Actor): Promise<RequestComment> {
+    const request = await this.requireRequest(id);
+
+    if (!canView(request, actor)) throw AppError.notFound('Request not found');
+
+    this.assertMayComment(request, actor, input.isInternal);
+
+    return this.writeComment(request.id, input, actor, new Date());
+  }
+
+  /**
+   * The thread, oldest first, with internal notes removed for anyone who is not
+   * a handler of this request. The filtering happens here rather than at the
+   * edge because this is the only method that returns comments at all.
+   */
+  async listComments(id: string, actor: Actor): Promise<RequestComment[]> {
+    const request = await this.getRequestById(id, actor);
+    const thread = await this.requests.listComments(request.id);
+
+    if (canReadInternal(request, actor)) return thread;
+    return thread.filter((comment) => !comment.isInternal);
+  }
+
+  /** The one place the rules about who may say what are written down. */
+  private assertMayComment(request: SupportRequest, actor: Actor, isInternal: boolean): void {
+    // Nothing moves out of CLOSED, and the same goes for the conversation: a
+    // thread that carries on after the request is finished is one nobody is
+    // watching, so an answer left there would never be read.
+    if (isTerminal(request.status)) {
+      throw AppError.unprocessable('A closed request cannot be commented on');
+    }
+
+    const relations = relationsOf(request, actor);
+    if (relations.size === 0) {
+      throw AppError.forbidden(
+        'Only the requester, the assignee or a manager can comment on a request',
+      );
+    }
+
+    if (isInternal && !canReadInternal(request, actor)) {
+      throw AppError.forbidden('Only the assignee or a manager can leave an internal note');
+    }
+  }
+
+  private async writeComment(
+    requestId: string,
+    input: AddCommentInput,
+    actor: Actor,
+    at: Date,
+  ): Promise<RequestComment> {
+    const comment: NewComment = {
+      authorId: actor.id,
+      body: input.body,
+      isInternal: input.isInternal,
+      at,
+    };
+
+    const saved = await this.requests.addComment(requestId, comment);
+    if (!saved) throw AppError.notFound('Request not found');
+
+    return saved;
   }
 
   /** The audit trail for one request, oldest first. */
@@ -351,6 +432,17 @@ export function canView(request: SupportRequest, actor: Actor): boolean {
     return request.assigneeId === actor.id || request.assigneeId === null;
   }
   return false;
+}
+
+/**
+ * Who an internal note is for: the people handling the request. That is the
+ * assignee and managers — the same pair the transition table calls a handler —
+ * and deliberately not "anyone with the AGENT role", so a note cannot be read
+ * by an agent who happens to have raised the request it is written on.
+ */
+export function canReadInternal(request: SupportRequest, actor: Actor): boolean {
+  const relations = relationsOf(request, actor);
+  return relations.has(ActorRelation.ASSIGNEE) || relations.has(ActorRelation.MANAGER);
 }
 
 function isTerminal(status: RequestStatus): boolean {

@@ -43,5 +43,7 @@ export function authed(app: Express, actor: TestActor) {
     get: (url: string) => agent.get(url).set('Authorization', `Bearer ${actor.token}`),
     post: (url: string) => agent.post(url).set('Authorization', `Bearer ${actor.token}`),
     patch: (url: string) => agent.patch(url).set('Authorization', `Bearer ${actor.token}`),
+    put: (url: string) => agent.put(url).set('Authorization', `Bearer ${actor.token}`),
+    delete: (url: string) => agent.delete(url).set('Authorization', `Bearer ${actor.token}`),
   };
 }
