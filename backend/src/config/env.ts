@@ -32,12 +32,21 @@ export type Env = z.infer<typeof EnvSchema>;
  *
  * Tests never touch a real deployment, so they get safe placeholders —
  * the in-memory Mongo server hands the real URI to connectDatabase directly.
+ *
+ * `DATABASE_URL` is accepted as an alias for `MONGODB_URI` and wins when both
+ * are set. It exists because that is the name the hosted deployment's dashboard
+ * carries; rather than rename the variable everywhere and invalidate every
+ * existing local `.env`, the two names meet here and the rest of the codebase
+ * goes on knowing exactly one of them.
  */
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   const isTest = source.NODE_ENV === 'test';
   const raw = {
     ...source,
-    MONGODB_URI: source.MONGODB_URI ?? (isTest ? 'mongodb://127.0.0.1:27017/helpdesk_test' : undefined),
+    MONGODB_URI:
+      source.DATABASE_URL ??
+      source.MONGODB_URI ??
+      (isTest ? 'mongodb://127.0.0.1:27017/helpdesk_test' : undefined),
     JWT_SECRET: source.JWT_SECRET ?? (isTest ? 'test-secret-value-not-for-production' : undefined),
   };
 
