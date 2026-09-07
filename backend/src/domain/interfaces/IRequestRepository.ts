@@ -1,3 +1,4 @@
+import type { NewComment, RequestComment } from '../entities/Comment';
 import type { RequestHistoryEntry, SupportRequest } from '../entities/Request';
 import type { RequestCategory } from '../enums/RequestCategory';
 import type { RequestPriority } from '../enums/RequestPriority';
@@ -61,4 +62,14 @@ export interface IRequestRepository {
   update(id: string, data: UpdateRequestData, historyEntry?: RequestHistoryEntry): Promise<SupportRequest | null>;
   countByStatus(query?: RequestQuery): Promise<StatusCount[]>;
   countByAssignee(query?: RequestQuery): Promise<AssigneeCount[]>;
+
+  /**
+   * Comments are read and written through their own methods rather than riding
+   * along on SupportRequest. A request is returned by half a dozen endpoints,
+   * including bulk lists; hanging an internal note off it would mean every one
+   * of those had to remember to redact. This way there is exactly one road in.
+   */
+  addComment(requestId: string, comment: NewComment): Promise<RequestComment | null>;
+  /** Oldest first — a conversation reads forwards. */
+  listComments(requestId: string): Promise<RequestComment[]>;
 }

@@ -85,6 +85,28 @@ export function isTerminal(status: RequestStatus): boolean {
 }
 
 /**
+ * Who may join the conversation, mirroring RequestService.assertMayComment.
+ *
+ * Holding any relation is enough — whoever raised it, whoever owns it, and
+ * managers. An agent browsing an unclaimed request can read the thread but has
+ * nothing to say about work they have not taken, so the composer is not offered
+ * until they claim it. Nothing is added to a closed request; it is finished.
+ */
+export function canComment(request: SupportRequest, viewer: User): boolean {
+  return !isTerminal(request.status) && relationsOf(request, viewer).size > 0
+}
+
+/**
+ * Who may write an internal note: the handlers of this request, the same pair
+ * the transition table calls a handler. Being an agent is not enough — an agent
+ * reading a request they raised themselves is its requester, not its handler.
+ */
+export function canWriteInternalNote(request: SupportRequest, viewer: User): boolean {
+  const relations = relationsOf(request, viewer)
+  return relations.has('ASSIGNEE') || relations.has('MANAGER')
+}
+
+/**
  * Agents only. Managers direct the work rather than doing it — they assign it,
  * or move its status, but the queue belongs to the agents.
  */

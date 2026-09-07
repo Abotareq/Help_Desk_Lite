@@ -1,6 +1,7 @@
 import type {
   Paginated,
   RequestCategory,
+  RequestComment,
   RequestHistoryEntry,
   RequestPriority,
   RequestStats,
@@ -73,13 +74,37 @@ export function assignRequest(id: string, assigneeId: string | null): Promise<Su
   }).then((r) => r.request)
 }
 
-export function updateStatus(
-  id: string,
-  status: RequestStatus,
-  note?: string,
-): Promise<SupportRequest> {
+export interface NewComment {
+  body: string
+  isInternal?: boolean
+}
+
+export function fetchComments(id: string): Promise<RequestComment[]> {
+  return apiFetch<{ comments: RequestComment[]; total: number }>(`/requests/${id}/comments`).then(
+    (r) => r.comments,
+  )
+}
+
+export function addComment(id: string, comment: NewComment): Promise<RequestComment> {
+  return apiFetch<{ comment: RequestComment }>(`/requests/${id}/comments`, {
+    method: 'POST',
+    body: comment,
+  }).then((r) => r.comment)
+}
+
+export interface StatusChange {
+  status: RequestStatus
+  /** Annotation on the move itself, shown against the history entry. */
+  note?: string
+  /** A message to the thread, posted by the same call so neither can be lost. */
+  comment?: NewComment
+}
+
+export function updateStatus(id: string, change: StatusChange): Promise<SupportRequest> {
+  const { status, note, comment } = change
+
   return apiFetch<{ request: SupportRequest }>(`/requests/${id}/status`, {
     method: 'PATCH',
-    body: note ? { status, note } : { status },
+    body: { status, ...(note ? { note } : {}), ...(comment ? { comment } : {}) },
   }).then((r) => r.request)
 }

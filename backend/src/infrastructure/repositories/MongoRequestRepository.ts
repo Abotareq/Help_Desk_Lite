@@ -1,4 +1,5 @@
 import { Types, type FilterQuery } from 'mongoose';
+import type { NewComment, RequestComment } from '../../domain/entities/Comment';
 import type { RequestHistoryEntry, SupportRequest } from '../../domain/entities/Request';
 import type { RequestStatus } from '../../domain/enums/RequestStatus';
 import type {
@@ -103,6 +104,62 @@ export class MongoRequestRepository implements IRequestRepository {
 
     return rows.map((row) => ({ assigneeId: row._id ? row._id.toString() : null, count: row.count }));
   }
+
+  async addComment(requestId: string, comment: NewComment): Promise<RequestComment | null> {
+    if (!isObjectIdLike(requestId)) return null;
+
+    // The id is minted here rather than read back off the pushed document, so
+    // what this returns is the comment that was written, not the last element
+    // of an array another writer may have appended to in between.
+    const _id = new Types.ObjectId();
+
+    const doc = await RequestModel.findByIdAndUpdate(requestId, {
+      $push: {
+        comments: {
+          _id,
+          authorId: new Types.ObjectId(comment.authorId),
+          body: comment.body,
+          isInternal: comment.isInternal,
+          at: comment.at,
+        },
+      },
+    });
+    if (!doc) return null;
+
+    return {
+      id: _id.toString(),
+      requestId,
+      authorId: comment.authorId,
+      body: comment.body,
+      isInternal: comment.isInternal,
+      at: comment.at,
+    };
+  }
+
+  async listComments(requestId: string): Promise<RequestComment[]> {
+    if (!isObjectIdLike(requestId)) return [];
+
+    const doc = await RequestModel.findById(requestId).select('comments');
+    if (!doc) return [];
+
+    return doc.comments
+      .map((c) => toCommentDomain(requestId, c))
+      .sort((a, b) => a.at.getTime() - b.at.getTime());
+  }
+}
+
+function toCommentDomain(
+  requestId: string,
+  comment: RequestHydrated['comments'][number],
+): RequestComment {
+  return {
+    id: comment._id.toString(),
+    requestId,
+    authorId: comment.authorId.toString(),
+    body: comment.body,
+    isInternal: comment.isInternal,
+    at: comment.at,
+  };
 }
 
 function buildFilter(query: RequestQuery): FilterQuery<Record<string, unknown>> {

@@ -139,7 +139,10 @@ describe('making a move', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument()
   })
 
-  it('passes the target status and the note through', async () => {
+  // A request going on hold is a question for the requester, so what the
+  // handler types is sent as a comment they can answer — not as a history note
+  // nobody can reply to.
+  it('sends the reason for a hold as a comment on the thread', async () => {
     const { onMove } = renderActions(
       requestWith({ status: RequestStatus.IN_PROGRESS, assigneeId: assignee.id }),
       assignee,
@@ -149,16 +152,35 @@ describe('making a move', () => {
     await userEvent.type(screen.getByRole('textbox'), 'Need your asset tag')
     await userEvent.click(screen.getByRole('button', { name: 'Wait on requester' }))
 
-    expect(onMove).toHaveBeenCalledWith(RequestStatus.WAITING, 'Need your asset tag')
+    expect(onMove).toHaveBeenCalledWith({
+      status: RequestStatus.WAITING,
+      comment: { body: 'Need your asset tag' },
+    })
   })
 
-  it('sends no note when the box is left blank', async () => {
+  it('sends the text on any other move as a note against the move itself', async () => {
+    const { onMove } = renderActions(
+      requestWith({ status: RequestStatus.IN_PROGRESS, assigneeId: assignee.id }),
+      assignee,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Resolve' }))
+    await userEvent.type(screen.getByRole('textbox'), 'Replaced the dock')
+    await userEvent.click(screen.getByRole('button', { name: 'Resolve' }))
+
+    expect(onMove).toHaveBeenCalledWith({
+      status: RequestStatus.RESOLVED,
+      note: 'Replaced the dock',
+    })
+  })
+
+  it('sends nothing but the status when the box is left blank', async () => {
     const { onMove } = renderActions(requestWith())
 
     await userEvent.click(screen.getByRole('button', { name: 'Withdraw' }))
     await userEvent.click(screen.getByRole('button', { name: 'Withdraw' }))
 
-    expect(onMove).toHaveBeenCalledWith(RequestStatus.CLOSED, undefined)
+    expect(onMove).toHaveBeenCalledWith({ status: RequestStatus.CLOSED })
   })
 
   it('treats whitespace as blank rather than sending it as a note', async () => {
@@ -168,7 +190,7 @@ describe('making a move', () => {
     await userEvent.type(screen.getByRole('textbox'), '   ')
     await userEvent.click(screen.getByRole('button', { name: 'Withdraw' }))
 
-    expect(onMove).toHaveBeenCalledWith(RequestStatus.CLOSED, undefined)
+    expect(onMove).toHaveBeenCalledWith({ status: RequestStatus.CLOSED })
   })
 
   // A request on hold without a reason is the ambiguity the PRD exists to remove.

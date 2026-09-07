@@ -6,7 +6,15 @@ import {
   ActorRelation,
 } from '../../../backend/src/domain/workflow/transitions'
 import { RequestStatus, UserRole, type SupportRequest, type User } from '../types/domain'
-import { TRANSITIONS, availableActions, canClaim, isTerminal, relationsOf } from './workflow'
+import {
+  TRANSITIONS,
+  availableActions,
+  canClaim,
+  canComment,
+  canWriteInternalNote,
+  isTerminal,
+  relationsOf,
+} from './workflow'
 
 /**
  * The frontend copy of the workflow exists so the UI never offers a control the
@@ -182,5 +190,60 @@ describe('canClaim', () => {
 
   it('refuses an employee, who has no queue', () => {
     expect(canClaim(requestWith(), employee)).toBe(false)
+  })
+})
+
+/**
+ * Mirrors RequestService.assertMayComment. Same reason as the transitions: if
+ * the UI offers a composer the API refuses, the person learns the rule from a
+ * 403 instead of from the controls.
+ */
+describe('canComment', () => {
+  it('lets the requester speak', () => {
+    expect(canComment(requestWith(), employee)).toBe(true)
+  })
+
+  it('lets the assignee speak', () => {
+    expect(canComment(requestWith({ assigneeId: agent.id }), agent)).toBe(true)
+  })
+
+  it('lets a manager speak on anything', () => {
+    expect(canComment(requestWith({ assigneeId: agent.id }), manager)).toBe(true)
+  })
+
+  it('refuses an agent who has not claimed the request', () => {
+    expect(canComment(requestWith(), otherAgent)).toBe(false)
+  })
+
+  it('refuses everyone once the request is closed', () => {
+    const closed = requestWith({ status: RequestStatus.CLOSED, assigneeId: agent.id })
+
+    expect([employee, agent, manager].map((v) => canComment(closed, v))).toEqual([
+      false,
+      false,
+      false,
+    ])
+  })
+})
+
+describe('canWriteInternalNote', () => {
+  it('allows the assignee', () => {
+    expect(canWriteInternalNote(requestWith({ assigneeId: agent.id }), agent)).toBe(true)
+  })
+
+  it('allows a manager', () => {
+    expect(canWriteInternalNote(requestWith(), manager)).toBe(true)
+  })
+
+  it('refuses the requester, who is the person it is kept from', () => {
+    expect(canWriteInternalNote(requestWith({ assigneeId: agent.id }), employee)).toBe(false)
+  })
+
+  // Being an agent is not the same as handling this request. An agent who
+  // raised a ticket about their own laptop is its requester.
+  it('refuses an agent reading a request they raised themselves', () => {
+    const own = requestWith({ requesterId: agent.id, assigneeId: otherAgent.id })
+
+    expect(canWriteInternalNote(own, agent)).toBe(false)
   })
 })

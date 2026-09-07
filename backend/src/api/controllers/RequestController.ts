@@ -63,6 +63,23 @@ export class RequestController {
     res.status(200).json({ history, total: history.length });
   };
 
+  addComment = async (req: Request, res: Response): Promise<void> => {
+    const comment = await this.requestService.addComment(
+      req.params.id as string,
+      req.body,
+      requireUser(req),
+    );
+    res.status(201).json({ comment });
+  };
+
+  listComments = async (req: Request, res: Response): Promise<void> => {
+    const comments = await this.requestService.listComments(
+      req.params.id as string,
+      requireUser(req),
+    );
+    res.status(200).json({ comments, total: comments.length });
+  };
+
   listMine = async (req: Request, res: Response): Promise<void> => {
     const result = await this.requestService.listMyRequests(requireUser(req), {
       page: req.query.page as number | undefined,
