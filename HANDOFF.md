@@ -157,8 +157,10 @@ unprompted — reshaping someone's epic structure is their call.
 - **No sprint exists.** KAN-50–58 sit in the backlog; the Atlassian MCP connector has no
   sprint-creation endpoint, so that is a board action.
 - **No end-to-end browser automation**, no React error boundary, no accessibility audit.
-- **25 stale branches on the remote** — nothing is deleted after merge, this update's own
-  branch included.
+- **Branches are deleted after merge.** The remote holds `main` and nothing else; the 25
+  that had piled up were pruned once every one was confirmed merged. Keep it that way —
+  `gh api -X DELETE repos/Abotareq/Help_Desk_Lite/git/refs/heads/<branch>` if `git push
+  --delete` is refused by the harness.
 - `S:\ICAREER\HelpDeskLiteIcareer\` is the superseded original frontend folder; safe to delete.
 
 ---
