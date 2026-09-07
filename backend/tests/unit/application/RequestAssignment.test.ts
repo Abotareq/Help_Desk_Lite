@@ -88,6 +88,14 @@ describe('RequestService assignment', () => {
       expect(again.history.filter((h) => h.type === 'ASSIGNED')).toHaveLength(1);
     });
 
+    // Managers direct the work rather than doing it. Letting them claim would
+    // blur the roles and stop the queue being the agents' queue.
+    it('will not let a manager claim work either', async () => {
+      await expect(service.claimRequest(requestId, manager)).rejects.toMatchObject({
+        statusCode: 403,
+      });
+    });
+
     it('will not let an employee claim work', async () => {
       await expect(service.claimRequest(requestId, employee)).rejects.toMatchObject({
         statusCode: 403,
@@ -138,6 +146,12 @@ describe('RequestService assignment', () => {
     it('will not let an agent reassign', async () => {
       await expect(service.assignRequest(requestId, agentTwo.id, agentOne)).rejects.toMatchObject({
         statusCode: 403,
+      });
+    });
+
+    it('refuses a manager as the owner', async () => {
+      await expect(service.assignRequest(requestId, manager.id, manager)).rejects.toMatchObject({
+        statusCode: 422,
       });
     });
 
@@ -199,6 +213,10 @@ describe('RequestService assignment', () => {
 
     it('refuses an employee, who has no queue', async () => {
       await expect(service.listMyRequests(employee)).rejects.toMatchObject({ statusCode: 403 });
+    });
+
+    it('refuses a manager, who oversees the queue rather than owning work in it', async () => {
+      await expect(service.listMyRequests(manager)).rejects.toMatchObject({ statusCode: 403 });
     });
   });
 });

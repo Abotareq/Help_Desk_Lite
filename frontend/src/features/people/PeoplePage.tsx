@@ -129,7 +129,8 @@ export function PeoplePage() {
         ) : users.length === 0 ? (
           <EmptyState title="No accounts yet" />
         ) : (
-          <table className="w-full border-collapse">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[46rem] border-collapse">
             <thead>
               <tr className="border-b border-line text-left text-xs font-medium text-ink-subtle">
                 <th scope="col" className="py-2 pl-4 pr-3 font-medium">
@@ -224,6 +225,7 @@ export function PeoplePage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </>

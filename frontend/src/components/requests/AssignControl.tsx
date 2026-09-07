@@ -24,9 +24,9 @@ export function AssignControl({ request }: { request: SupportRequest }) {
     },
   })
 
-  // Only staff can own work — the API refuses an employee, so offering one
-  // would be setting the manager up for a 422.
-  const handlers = (users ?? []).filter((u) => u.role !== UserRole.EMPLOYEE && u.isActive)
+  // Agents only. The API refuses anyone else, so offering an employee — or
+  // another manager — would be setting this manager up for a 422.
+  const handlers = (users ?? []).filter((u) => u.role === UserRole.AGENT && u.isActive)
 
   return (
     <div className="space-y-2">

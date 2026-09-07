@@ -82,7 +82,7 @@ export function RequestDetailPage() {
       />
 
       <div className="flex-1 overflow-auto bg-canvas">
-        <div className="mx-auto grid max-w-5xl gap-4 p-4 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-5xl gap-4 p-3 sm:p-4 lg:grid-cols-3">
           <div className="space-y-4 lg:col-span-2">
             <Card>
               <CardHeader>

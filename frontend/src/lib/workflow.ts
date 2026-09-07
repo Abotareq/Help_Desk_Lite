@@ -84,10 +84,12 @@ export function isTerminal(status: RequestStatus): boolean {
   return TRANSITIONS.every((t) => t.from !== status)
 }
 
+/**
+ * Agents only. Managers direct the work rather than doing it — they assign it,
+ * or move its status, but the queue belongs to the agents.
+ */
 export function canClaim(request: SupportRequest, viewer: User): boolean {
   return (
-    request.assigneeId === null &&
-    !isTerminal(request.status) &&
-    (viewer.role === UserRole.AGENT || viewer.role === UserRole.MANAGER)
+    request.assigneeId === null && !isTerminal(request.status) && viewer.role === UserRole.AGENT
   )
 }
