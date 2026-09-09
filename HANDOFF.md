@@ -1,6 +1,6 @@
 # HelpDesk Lite — session handoff
 
-Last updated: 2026-09-07 · `main` at `08d07f8` · 24 PRs merged · no open PRs
+Last updated: 2026-09-09 · `main` at `9edf195` · 27 PRs merged · no open PRs
 
 ---
 
@@ -19,7 +19,7 @@ helpdesk-lite/
 Repo: <https://github.com/Abotareq/Help_Desk_Lite> · Jira: project **KAN** on
 `tareq12.atlassian.net` (MCP already connected, read+write).
 
-**339 backend tests, 141 frontend.** Coverage floor enforced in CI (95% statements,
+**350 backend tests, 141 frontend.** Coverage floor enforced in CI (95% statements,
 80% branches; `src/domain/workflow/` pinned at 100%).
 
 ---
@@ -89,7 +89,8 @@ filterable list and aggregate counts.
 
 ## How this project works
 
-Every change follows the same loop, and it has repeatedly paid for itself:
+`WORKFLOW.md` covers this in full, including the traps. In short — every change follows
+the same loop, and it has repeatedly paid for itself:
 
 1. Branch → build → **test** → PR with a body explaining the *why*, not just the what
 2. CI must be green before merge (`npm ci` → `npm run build` → `npm run test:coverage`)
@@ -135,7 +136,7 @@ this project exists to remove.
 | Ticket | Why it matters |
 | --- | --- |
 | **KAN-53** Notifications | Now the biggest gap, and comments made it bigger: people can talk on a request but nobody is told when they do. "No updates without chasing" is a stated problem in the PRD. |
-| **KAN-55** Docker + compose | Only worth doing once a deploy target is chosen. |
+| **KAN-55** Docker + compose | The deploy target is now Vercel, so this is for local parity and any future self-hosting, not for shipping. |
 | **KAN-56** OpenAPI from the Zod schemas | Would let the hand-written `frontend/src/types/domain.ts` be generated instead. |
 | **KAN-57** Logging, `/ready`, request ids | Rate limiting is done; the operability half is not. |
 | **KAN-58** Metrics | The PRD names four success metrics and none are measurable. |
@@ -150,9 +151,10 @@ unprompted — reshaping someone's epic structure is their call.
 
 ## Not done, and worth knowing
 
-- **Never deployed.** Runs on this machine and on GitHub's CI runners, nowhere else. This
-  is the only thing between the current state and a support team using it.
-- **`main` is unprotected.** CI reports failures but will not block a merge; all 24 PRs
+- **Deployed to Vercel** (PR #27) — API as a serverless function, client as static output
+  on the same origin. No connection string is committed: environment variables live in the
+  dashboard, and Atlas Network Access must permit Vercel's dynamic egress IPs.
+- **`main` is unprotected.** CI reports failures but will not block a merge; all 27 PRs
   were merged directly. Settings → Branches → require `Typecheck and test`.
 - **No sprint exists.** KAN-50–58 sit in the backlog; the Atlassian MCP connector has no
   sprint-creation endpoint, so that is a board action.
@@ -169,9 +171,7 @@ unprompted — reshaping someone's epic structure is their call.
 
 Nothing in flight. `main` is green, the tree is clean, and there are no open PRs.
 
-Start with whatever you pick from the v2 backlog above — or, if the goal is to get this in
-front of real users, pick a deploy target first, because that is the only thing standing
-between the current state and a support team using it.
+Start with whatever you pick from the v2 backlog above. KAN-53 is top of it.
 
 The local test database `helpdesk_lite` holds four requests and four users. **HD-000004 is
 the one to demo**: raised by `employee@example.com`, claimed by `agent@example.com`, parked
