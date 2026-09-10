@@ -83,7 +83,7 @@ export function NewUserForm({ onDone }: { onDone: () => void }) {
           label={t('people.tempPassword')}
           htmlFor="new-password"
           error={error?.fieldError('password')}
-          hint="At least 8 characters"
+          hint={t('people.passwordHint')}
         >
           <Input
             id="new-password"

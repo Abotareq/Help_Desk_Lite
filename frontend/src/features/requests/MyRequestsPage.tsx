@@ -29,7 +29,7 @@ export function MyRequestsPage() {
     <>
       <PageHeader
         title={t('myRequests.title')}
-        subtitle={data ? `${data.total} total` : undefined}
+        subtitle={data ? t('requests.total', { count: data.total }) : undefined}
         actions={
           <Link to="/requests/new">
             <Button variant="primary" size="sm">
@@ -53,7 +53,7 @@ export function MyRequestsPage() {
         ) : data.items.length === 0 ? (
           <EmptyState
             title={t('myRequests.empty')}
-            description="When you need help with a laptop, an account, the building or anything else, raise it here so it does not get lost in a chat thread."
+            description={t('myRequests.emptyHint')}
             action={
               <Link to="/requests/new">
                 <Button variant="primary" size="sm">

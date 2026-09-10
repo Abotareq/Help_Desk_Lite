@@ -73,7 +73,7 @@ export function NewRequestPage() {
               label={t('newRequest.what')}
               htmlFor="title"
               error={error?.fieldError('title')}
-              hint="A short summary — “Laptop will not boot”"
+              hint={t('newRequest.titleHint')}
             >
               <Input
                 id="title"
@@ -88,7 +88,7 @@ export function NewRequestPage() {
               label={t('newRequest.details')}
               htmlFor="description"
               error={error?.fieldError('description')}
-              hint="What happened, when it started, and anything you have already tried."
+              hint={t('newRequest.detailsHint')}
             >
               <Textarea
                 id="description"
@@ -108,7 +108,7 @@ export function NewRequestPage() {
                   onChange={(e) => setCategory(e.target.value as RequestCategory)}
                 >
                   <option value="" disabled>
-                    Choose one…
+                    {t('newRequest.chooseCategory')}
                   </option>
                   {Object.values(RequestCategory).map((value) => (
                     <option key={value} value={value}>

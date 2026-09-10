@@ -63,7 +63,7 @@ export function ResetPasswordDialog({ user, onClose }: { user: User; onClose: ()
         label={t('people.newPassword')}
         htmlFor={`reset-${user.id}`}
         error={error?.fieldError('password')}
-        hint="At least 8 characters. They will need it to sign in."
+        hint={t('people.newPasswordHint')}
       >
         <Input
           id={`reset-${user.id}`}

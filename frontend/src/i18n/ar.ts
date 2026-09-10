@@ -251,6 +251,40 @@ export const ar: Catalogue = {
 
   'queue.claimFromUnclaimed': 'استلم طلبًا من تبويب غير المُسند لتبدأ العمل عليه.',
 
+  'dashboard.openHint': 'ما زالت تنتظر من يتولاها',
+  'dashboard.unclaimedHint': 'لم يستلمها أحد بعد',
+  'dashboard.totalHint': 'كل ما قُدّم حتى الآن',
+
+  'people.count': {
+    zero: 'لا توجد حسابات',
+    one: 'حساب واحد',
+    two: 'حسابان',
+    few: '{count} حسابات',
+    many: '{count} حسابًا',
+    other: '{count} حساب',
+  },
+  'people.roleFor': 'دور {name}',
+  'people.passwordHint': '‏8 أحرف على الأقل',
+  'people.newPasswordHint': '‏8 أحرف على الأقل. سيحتاجها لتسجيل الدخول.',
+
+  'myRequests.emptyHint': 'عندما تحتاج مساعدة بخصوص جهاز أو حساب أو المبنى أو أي شيء آخر، سجّلها هنا حتى لا تضيع في محادثة.',
+
+  'newRequest.titleHint': 'ملخص قصير — «الجهاز لا يعمل»',
+  'newRequest.detailsHint': 'ما الذي حدث، ومتى بدأ، وما جرّبته حتى الآن.',
+
+  'newRequest.chooseCategory': 'اختر واحدًا…',
+
+  'common.youMarker': '(أنت)',
+
+  'people.orphaned': {
+    zero: 'لا توجد طلبات مفتوحة بحاجة إلى مسؤول جديد',
+    one: 'طلب مفتوح واحد بحاجة إلى مسؤول جديد',
+    two: 'طلبان مفتوحان بحاجة إلى مسؤول جديد',
+    few: '{count} طلبات مفتوحة بحاجة إلى مسؤول جديد',
+    many: '{count} طلبًا مفتوحًا بحاجة إلى مسؤول جديد',
+    other: '{count} طلب مفتوح بحاجة إلى مسؤول جديد',
+  },
+
   'common.loading': 'جارٍ التحميل',
   'common.retry': 'إعادة المحاولة',
 }

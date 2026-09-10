@@ -62,7 +62,7 @@ export function PeoplePage() {
     <>
       <PageHeader
         title={t('people.title')}
-        subtitle={users ? `${users.length} accounts` : undefined}
+        subtitle={users ? t('people.count', { count: users.length }) : undefined}
         actions={
           <Button variant="primary" size="sm" onClick={() => setCreating((open) => !open)}>
             {creating ? t('common.cancel') : t('people.addPerson')}
@@ -86,8 +86,7 @@ export function PeoplePage() {
           <div className="p-4 pb-0">
             <Alert tone="warning">
               <p className="font-medium">
-                {orphaned.length} open {orphaned.length === 1 ? 'request needs' : 'requests need'} a
-                new owner
+                {t('people.orphaned', { count: orphaned.length })}
               </p>
               <ul className="mt-1 space-y-0.5">
                 {orphaned.map((r) => (
@@ -159,14 +158,14 @@ export function PeoplePage() {
                       <Avatar name={user.name} />
                       {user.name}
                       {user.id === viewer.id ? (
-                        <span className="text-xs text-ink-subtle">(you)</span>
+                        <span className="text-xs text-ink-subtle">{t('common.youMarker')}</span>
                       ) : null}
                     </span>
                   </td>
                   <td className="py-2 pe-3 text-sm text-ink-muted">{user.email}</td>
                   <td className="py-2 pe-3">
                     <Select
-                      aria-label={`Role for ${user.name}`}
+                      aria-label={t('people.roleFor', { name: user.name })}
                       className="h-7"
                       value={user.role}
                       disabled={updateUser.isPending}

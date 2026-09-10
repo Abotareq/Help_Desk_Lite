@@ -231,6 +231,29 @@ export const en = {
 
   'queue.claimFromUnclaimed': 'Claim something from the unclaimed tab to start working it.',
 
+  'dashboard.openHint': 'Still needs someone',
+  'dashboard.unclaimedHint': 'Nobody has picked these up',
+  'dashboard.totalHint': 'Everything ever raised',
+
+  'people.count': { one: '{count} account', other: '{count} accounts' },
+  'people.roleFor': 'Role for {name}',
+  'people.passwordHint': 'At least 8 characters',
+  'people.newPasswordHint': 'At least 8 characters. They will need it to sign in.',
+
+  'myRequests.emptyHint': 'When you need help with a laptop, an account, the building or anything else, raise it here so it does not get lost in a chat thread.',
+
+  'newRequest.titleHint': 'A short summary — "Laptop will not boot"',
+  'newRequest.detailsHint': 'What happened, when it started, and anything you have already tried.',
+
+  'newRequest.chooseCategory': 'Choose one…',
+
+  'common.youMarker': '(you)',
+
+  'people.orphaned': {
+    one: '{count} open request needs a new owner',
+    other: '{count} open requests need a new owner',
+  },
+
   'common.loading': 'Loading',
   'common.retry': 'Try again',
 } as const satisfies Record<string, Message>
