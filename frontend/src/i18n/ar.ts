@@ -194,6 +194,97 @@ export const ar: Catalogue = {
   'newRequest.what': 'ما الذي تحتاجه؟',
   'newRequest.details': 'التفاصيل',
 
+  'common.cancel': 'إلغاء',
+  'common.dismiss': 'إخفاء',
+  'common.done': 'تم',
+  'common.previous': 'السابق',
+  'common.next': 'التالي',
+  'common.unknown': 'غير معروف',
+  'common.unknownUser': 'مستخدم غير معروف',
+
+  'signIn.networkError': 'تعذّر الوصول إلى الخادم',
+
+  'newRequest.submit': 'إرسال الطلب',
+  'newRequest.catIT': 'تقنية المعلومات — الأجهزة والبرامج والحسابات والشبكة',
+  'newRequest.catHR': 'الموارد البشرية — الرواتب والإجازات والمزايا',
+  'newRequest.catFACILITIES': 'المرافق — المكاتب والمبنى والتجهيزات',
+  'newRequest.catOTHER': 'شيء آخر',
+  'newRequest.priLOW': 'منخفضة — وقت ما يتسع الوقت',
+  'newRequest.priMEDIUM': 'متوسطة — الوضع المعتاد',
+  'newRequest.priHIGH': 'عالية — العمل متوقف',
+
+  'myRequests.submitFirst': 'قدّم طلبك الأول',
+  'myRequests.loadFailed': 'تعذّر تحميل طلباتك.',
+
+  'dashboard.loadFailed': 'تعذّر تحميل لوحة المتابعة.',
+
+  'allRequests.loadFailed': 'تعذّر تحميل الطلبات.',
+  'allRequests.clearFilters': 'مسح التصفية',
+  'allRequests.owner': 'المسؤول',
+  'filters.tryWidening': 'جرّب توسيع إحدى خانات التصفية.',
+  'filters.noneRaised': 'لم يُقدَّم أي طلب بعد.',
+
+  'queue.myWork': 'عملي',
+  'queue.claim': 'استلام',
+  'queue.claimFailed': 'تعذّر استلام هذا الطلب.',
+  'queue.loadFailed': 'تعذّر تحميل قائمة العمل.',
+  'queue.emptyMine': 'لم تستلم أي طلب بعد',
+  'queue.emptyUnclaimed': 'لا يوجد ما ينتظر الاستلام',
+  'queue.allOwned': 'كل طلب مفتوح له مسؤول بالفعل. هذا يعني أن قائمة العمل تؤدي دورها.',
+  'queue.seeUnclaimed': 'عرض غير المُسند',
+
+  'people.addPerson': 'إضافة شخص',
+  'people.createAccount': 'إنشاء حساب',
+  'people.resetPassword': 'إعادة تعيين كلمة المرور',
+  'people.deactivate': 'تعطيل',
+  'people.reactivate': 'إعادة التفعيل',
+  'people.status': 'الحالة',
+  'people.you': 'أنت',
+  'people.lastManager': 'آخر مدير',
+  'people.cannotDeactivateSelf': 'لا يمكنك تعطيل حسابك الخاص',
+  'people.lastManagerLocked': 'لا يمكن تعطيل آخر مدير نشط',
+  'people.updateFailed': 'تعذّر تحديث هذا الحساب.',
+  'people.loadFailed': 'تعذّر تحميل قائمة الأشخاص.',
+  'people.roleEmployeeHint': 'يقدّم الطلبات ويتابع طلباته',
+  'people.roleAgentHint': 'فريق الدعم — يستلم الطلبات وينفّذها ويحلّها',
+  'people.roleManagerHint': 'يرى كل شيء، ويوزّع العمل، ويدير الحسابات',
+
+  'queue.claimFromUnclaimed': 'استلم طلبًا من تبويب غير المُسند لتبدأ العمل عليه.',
+
+  'dashboard.openHint': 'ما زالت تنتظر من يتولاها',
+  'dashboard.unclaimedHint': 'لم يستلمها أحد بعد',
+  'dashboard.totalHint': 'كل ما قُدّم حتى الآن',
+
+  'people.count': {
+    zero: 'لا توجد حسابات',
+    one: 'حساب واحد',
+    two: 'حسابان',
+    few: '{count} حسابات',
+    many: '{count} حسابًا',
+    other: '{count} حساب',
+  },
+  'people.roleFor': 'دور {name}',
+  'people.passwordHint': '‏8 أحرف على الأقل',
+  'people.newPasswordHint': '‏8 أحرف على الأقل. سيحتاجها لتسجيل الدخول.',
+
+  'myRequests.emptyHint': 'عندما تحتاج مساعدة بخصوص جهاز أو حساب أو المبنى أو أي شيء آخر، سجّلها هنا حتى لا تضيع في محادثة.',
+
+  'newRequest.titleHint': 'ملخص قصير — «الجهاز لا يعمل»',
+  'newRequest.detailsHint': 'ما الذي حدث، ومتى بدأ، وما جرّبته حتى الآن.',
+
+  'newRequest.chooseCategory': 'اختر واحدًا…',
+
+  'common.youMarker': '(أنت)',
+
+  'people.orphaned': {
+    zero: 'لا توجد طلبات مفتوحة بحاجة إلى مسؤول جديد',
+    one: 'طلب مفتوح واحد بحاجة إلى مسؤول جديد',
+    two: 'طلبان مفتوحان بحاجة إلى مسؤول جديد',
+    few: '{count} طلبات مفتوحة بحاجة إلى مسؤول جديد',
+    many: '{count} طلبًا مفتوحًا بحاجة إلى مسؤول جديد',
+    other: '{count} طلب مفتوح بحاجة إلى مسؤول جديد',
+  },
+
   'common.loading': 'جارٍ التحميل',
   'common.retry': 'إعادة المحاولة',
 }

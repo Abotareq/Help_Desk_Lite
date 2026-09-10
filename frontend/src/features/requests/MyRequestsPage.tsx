@@ -29,11 +29,11 @@ export function MyRequestsPage() {
     <>
       <PageHeader
         title={t('myRequests.title')}
-        subtitle={data ? `${data.total} total` : undefined}
+        subtitle={data ? t('requests.total', { count: data.total }) : undefined}
         actions={
           <Link to="/requests/new">
             <Button variant="primary" size="sm">
-              New request
+              {t('requests.newRequest')}
             </Button>
           </Link>
         }
@@ -47,17 +47,17 @@ export function MyRequestsPage() {
         ) : error ? (
           <div className="p-4">
             <Alert>
-              {error instanceof ApiError ? error.message : 'Could not load your requests.'}
+              {error instanceof ApiError ? error.message : t('myRequests.loadFailed')}
             </Alert>
           </div>
         ) : data.items.length === 0 ? (
           <EmptyState
             title={t('myRequests.empty')}
-            description="When you need help with a laptop, an account, the building or anything else, raise it here so it does not get lost in a chat thread."
+            description={t('myRequests.emptyHint')}
             action={
               <Link to="/requests/new">
                 <Button variant="primary" size="sm">
-                  Submit your first request
+                  {t('myRequests.submitFirst')}
                 </Button>
               </Link>
             }

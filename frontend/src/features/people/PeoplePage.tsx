@@ -15,6 +15,7 @@ import { UserRole, type OrphanedRequest, type User } from '../../types/domain'
 import { NewUserForm } from './NewUserForm'
 import { ResetPasswordDialog } from './ResetPasswordDialog'
 import { useI18n } from '../../hooks/useI18n'
+import { roleKey } from '../../i18n/keys'
 
 export function PeoplePage() {
   const { t } = useI18n()
@@ -62,10 +63,10 @@ export function PeoplePage() {
     <>
       <PageHeader
         title={t('people.title')}
-        subtitle={users ? `${users.length} accounts` : undefined}
+        subtitle={users ? t('people.count', { count: users.length }) : undefined}
         actions={
           <Button variant="primary" size="sm" onClick={() => setCreating((open) => !open)}>
-            {creating ? 'Cancel' : 'Add person'}
+            {creating ? t('common.cancel') : t('people.addPerson')}
           </Button>
         }
       />
@@ -86,8 +87,7 @@ export function PeoplePage() {
           <div className="p-4 pb-0">
             <Alert tone="warning">
               <p className="font-medium">
-                {orphaned.length} open {orphaned.length === 1 ? 'request needs' : 'requests need'} a
-                new owner
+                {t('people.orphaned', { count: orphaned.length })}
               </p>
               <ul className="mt-1 space-y-0.5">
                 {orphaned.map((r) => (
@@ -99,7 +99,7 @@ export function PeoplePage() {
                 ))}
               </ul>
               <Button size="sm" className="mt-2" onClick={() => setOrphaned(null)}>
-                Dismiss
+                {t('common.dismiss')}
               </Button>
             </Alert>
           </div>
@@ -116,7 +116,7 @@ export function PeoplePage() {
             <Alert>
               {updateUser.error instanceof ApiError
                 ? updateUser.error.message
-                : 'Could not update that account.'}
+                : t('people.updateFailed')}
             </Alert>
           </div>
         ) : null}
@@ -127,7 +127,7 @@ export function PeoplePage() {
           </div>
         ) : error ? (
           <div className="p-4">
-            <Alert>{error instanceof ApiError ? error.message : 'Could not load people.'}</Alert>
+            <Alert>{error instanceof ApiError ? error.message : t('people.loadFailed')}</Alert>
           </div>
         ) : users.length === 0 ? (
           <EmptyState title={t('people.noAccounts')} />
@@ -137,16 +137,16 @@ export function PeoplePage() {
             <thead>
               <tr className="border-b border-line text-start text-xs font-medium text-ink-subtle">
                 <th scope="col" className="py-2 ps-4 pe-3 font-medium">
-                  Name
+                  {t('people.name')}
                 </th>
                 <th scope="col" className="py-2 pe-3 font-medium">
-                  Email
+                  {t('people.email')}
                 </th>
                 <th scope="col" className="w-32 py-2 pe-3 font-medium">
-                  Role
+                  {t('people.role')}
                 </th>
                 <th scope="col" className="w-24 py-2 pe-3 font-medium">
-                  Status
+                  {t('people.status')}
                 </th>
                 <th scope="col" className="w-56 py-2 pe-4 font-medium" />
               </tr>
@@ -159,14 +159,14 @@ export function PeoplePage() {
                       <Avatar name={user.name} />
                       {user.name}
                       {user.id === viewer.id ? (
-                        <span className="text-xs text-ink-subtle">(you)</span>
+                        <span className="text-xs text-ink-subtle">{t('common.youMarker')}</span>
                       ) : null}
                     </span>
                   </td>
                   <td className="py-2 pe-3 text-sm text-ink-muted">{user.email}</td>
                   <td className="py-2 pe-3">
                     <Select
-                      aria-label={`Role for ${user.name}`}
+                      aria-label={t('people.roleFor', { name: user.name })}
                       className="h-7"
                       value={user.role}
                       disabled={updateUser.isPending}
@@ -179,7 +179,7 @@ export function PeoplePage() {
                     >
                       {Object.values(UserRole).map((role) => (
                         <option key={role} value={role}>
-                          {role}
+                          {t(roleKey(role))}
                         </option>
                       ))}
                     </Select>
@@ -199,7 +199,7 @@ export function PeoplePage() {
                         disabled={updateUser.isPending}
                         onClick={() => setResetting(user)}
                       >
-                        Reset password
+                        {t('people.resetPassword')}
                       </Button>
                     {canDeactivate(user) ? (
                       <Button
@@ -208,18 +208,18 @@ export function PeoplePage() {
                         disabled={updateUser.isPending}
                         onClick={() => toggleActive(user)}
                       >
-                        {user.isActive ? 'Deactivate' : 'Reactivate'}
+                        {user.isActive ? t('people.deactivate') : t('people.reactivate')}
                       </Button>
                     ) : (
                       <span
                         className="text-xs text-ink-subtle"
                         title={
                           user.id === viewer.id
-                            ? 'You cannot deactivate your own account'
-                            : 'The last active manager cannot be deactivated'
+                            ? t('people.cannotDeactivateSelf')
+                            : t('people.lastManagerLocked')
                         }
                       >
-                        {user.id === viewer.id ? 'You' : 'Last manager'}
+                        {user.id === viewer.id ? t('people.you') : t('people.lastManager')}
                       </span>
                     )}
                     </div>

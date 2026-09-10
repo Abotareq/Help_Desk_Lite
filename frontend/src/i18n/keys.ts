@@ -1,4 +1,5 @@
 import type { RequestCategory, RequestPriority, RequestStatus, UserRole } from '../types/domain'
+import type { ThemePreference } from '../features/theme/themeContext'
 import type { MessageKey } from './en'
 
 /**
@@ -22,4 +23,8 @@ export function categoryKey(category: RequestCategory): MessageKey {
 
 export function roleKey(role: UserRole): MessageKey {
   return `role.${role}`
+}
+
+export function themeKey(preference: ThemePreference): MessageKey {
+  return `theme.${preference === 'system' ? 'system' : preference}`
 }

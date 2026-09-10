@@ -117,6 +117,10 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     const error = new ApiError(
       response.status,
       envelope?.code ?? 'UNKNOWN',
+      // Deliberately untranslated: this stands in for an API error message when
+      // the response carries no envelope, and API messages are English until
+      // KAN-69 gives them keys. Translating only the fallback would suggest a
+      // coverage that does not exist.
       envelope?.message ?? `Request failed with ${response.status}`,
       envelope?.details ?? [],
     )

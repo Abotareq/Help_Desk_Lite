@@ -41,7 +41,7 @@ export function ResetPasswordDialog({ user, onClose }: { user: User; onClose: ()
           {password}
         </code>
         <Button size="sm" onClick={onClose}>
-          Done
+          {t('common.done')}
         </Button>
       </div>
     )
@@ -63,7 +63,7 @@ export function ResetPasswordDialog({ user, onClose }: { user: User; onClose: ()
         label={t('people.newPassword')}
         htmlFor={`reset-${user.id}`}
         error={error?.fieldError('password')}
-        hint="At least 8 characters. They will need it to sign in."
+        hint={t('people.newPasswordHint')}
       >
         <Input
           id={`reset-${user.id}`}
@@ -77,10 +77,10 @@ export function ResetPasswordDialog({ user, onClose }: { user: User; onClose: ()
 
       <div className="flex gap-2">
         <Button type="submit" variant="primary" size="sm" loading={resetPassword.isPending}>
-          Reset password
+          {t('people.resetPassword')}
         </Button>
         <Button size="sm" onClick={onClose} disabled={resetPassword.isPending}>
-          Cancel
+          {t('common.cancel')}
         </Button>
       </div>
     </form>

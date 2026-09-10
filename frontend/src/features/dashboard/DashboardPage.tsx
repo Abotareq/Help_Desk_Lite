@@ -73,7 +73,7 @@ export function DashboardPage() {
         <PageHeader title={t('dashboard.title')} />
         <div className="p-4">
           <Alert>
-            {error instanceof ApiError ? error.message : 'Could not load the dashboard.'}
+            {error instanceof ApiError ? error.message : t('dashboard.loadFailed')}
           </Alert>
         </div>
       </>
@@ -89,15 +89,15 @@ export function DashboardPage() {
       <div className="flex-1 overflow-auto bg-canvas p-4">
         <div className="mx-auto max-w-5xl space-y-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <StatTile label={t('dashboard.open')} value={stats.open} hint="Still needs someone" to="/all" />
+            <StatTile label={t('dashboard.open')} value={stats.open} hint={t('dashboard.openHint')} to="/all" />
             <StatTile
               label={t('dashboard.unclaimed')}
               value={stats.unassigned}
-              hint="Nobody has picked these up"
+              hint={t('dashboard.unclaimedHint')}
               to="/all?assignee=unassigned"
               emphasis
             />
-            <StatTile label={t('dashboard.total')} value={stats.total} hint="Everything ever raised" to="/all" />
+            <StatTile label={t('dashboard.total')} value={stats.total} hint={t('dashboard.totalHint')} to="/all" />
           </div>
 
           <Card>
@@ -140,10 +140,10 @@ export function DashboardPage() {
                     >
                       {row.assigneeId ? (
                         <span className="inline-flex items-center gap-2 text-sm text-ink">
-                          <Avatar name={name ?? 'Unknown'} />
-                          {name ?? 'Unknown user'}
+                          <Avatar name={name ?? t('common.unknown')} />
+                          {name ?? t('common.unknownUser')}
                           {row.assigneeId === viewer.id ? (
-                            <span className="text-xs text-ink-subtle">(you)</span>
+                            <span className="text-xs text-ink-subtle">{t('common.youMarker')}</span>
                           ) : null}
                         </span>
                       ) : (
@@ -151,7 +151,7 @@ export function DashboardPage() {
                           to="/all?assignee=unassigned"
                           className="text-sm text-status-waiting hover:underline"
                         >
-                          Unclaimed
+                          {t('dashboard.unclaimed')}
                         </Link>
                       )}
                       <span className="text-sm tabular-nums text-ink">{row.count}</span>

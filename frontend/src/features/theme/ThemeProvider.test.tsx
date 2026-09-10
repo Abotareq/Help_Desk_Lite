@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ThemeToggle } from '../../components/layout/ThemeToggle'
 import { useTheme } from '../../hooks/useTheme'
+import { I18nProvider } from '../../i18n/I18nProvider'
 import { ThemeProvider } from './ThemeProvider'
 import { THEME_KEY } from './themeContext'
 
@@ -37,10 +38,13 @@ function Probe() {
 }
 
 function renderTheme() {
+  // ThemeToggle reads its labels from the catalogue now, so it needs both.
   return render(
     <ThemeProvider>
-      <ThemeToggle />
-      <Probe />
+      <I18nProvider>
+        <ThemeToggle />
+        <Probe />
+      </I18nProvider>
     </ThemeProvider>,
   )
 }
