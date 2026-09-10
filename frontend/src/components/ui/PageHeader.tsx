@@ -6,10 +6,16 @@ interface PageHeaderProps {
   title: string
   subtitle?: string
   actions?: ReactNode
+  /**
+   * Set when the title or subtitle is the user's text rather than ours — a
+   * request's own subject, for instance, which may not be in the page's
+   * language and must not inherit its direction.
+   */
+  contentDir?: 'auto' | 'ltr' | 'rtl'
 }
 
 /** The thin breadcrumb-style bar at the top of every screen, as Frappe does it. */
-export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, actions, contentDir }: PageHeaderProps) {
   const { t } = useI18n()
 
   const sidebar = useSidebar()
@@ -36,9 +42,13 @@ export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
           </button>
         ) : null}
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
-          <h1 className="truncate text-sm font-semibold text-ink">{title}</h1>
+          <h1 dir={contentDir} className="truncate text-sm font-semibold text-ink">
+            {title}
+          </h1>
           {subtitle ? (
-            <span className="truncate text-xs text-ink-subtle">{subtitle}</span>
+            <span dir={contentDir} className="truncate text-xs text-ink-subtle">
+              {subtitle}
+            </span>
           ) : null}
         </div>
       </div>

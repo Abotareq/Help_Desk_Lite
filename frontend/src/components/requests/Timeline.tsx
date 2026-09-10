@@ -159,13 +159,17 @@ export function Timeline({ history, comments, names }: TimelineProps) {
               </div>
 
               {item.kind === 'event' && item.entry.note ? (
-                <p className="mt-1 rounded-md border border-line bg-canvas px-2.5 py-1.5 text-sm text-ink-muted">
+                <p
+                  dir="auto"
+                  className="mt-1 rounded-md border border-line bg-canvas px-2.5 py-1.5 text-sm text-ink-muted"
+                >
                   {item.entry.note}
                 </p>
               ) : null}
 
               {item.kind === 'comment' ? (
                 <p
+                  dir="auto"
                   className={`mt-1 whitespace-pre-wrap rounded-md border px-2.5 py-1.5 text-sm ${
                     item.comment.isInternal
                       ? 'border-dashed border-priority-medium/40 bg-priority-medium/5 text-ink'

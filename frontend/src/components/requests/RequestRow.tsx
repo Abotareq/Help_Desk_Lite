@@ -32,7 +32,7 @@ export function RequestRow({ request, trailing }: RequestRowProps) {
         </Link>
       </td>
       <td className="max-w-0 py-2 pe-3 align-middle">
-        <Link to={`/requests/${request.id}`} className="block truncate text-sm text-ink">
+        <Link dir="auto" to={`/requests/${request.id}`} className="block truncate text-sm text-ink">
           {request.title}
         </Link>
       </td>

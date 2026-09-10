@@ -91,6 +91,7 @@ export function RequestDetailPage() {
   return (
     <>
       <PageHeader
+        contentDir="auto"
         title={request.reference}
         subtitle={request.title}
         actions={<StatusBadge status={request.status} />}
@@ -101,9 +102,9 @@ export function RequestDetailPage() {
           <div className="space-y-4 lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>{request.title}</CardTitle>
+                <CardTitle dir="auto">{request.title}</CardTitle>
               </CardHeader>
-              <p className="whitespace-pre-wrap px-4 py-3 text-sm text-ink">
+              <p dir="auto" className="whitespace-pre-wrap px-4 py-3 text-sm text-ink">
                 {request.description}
               </p>
             </Card>
