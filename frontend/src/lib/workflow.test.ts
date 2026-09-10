@@ -152,7 +152,7 @@ describe('availableActions', () => {
     const request = requestWith({ status: RequestStatus.RESOLVED, assigneeId: agent.id })
     const reopen = availableActions(request, employee).find((a) => a.isReopen)
 
-    expect(reopen).toMatchObject({ to: RequestStatus.IN_PROGRESS, label: 'Reopen' })
+    expect(reopen).toMatchObject({ to: RequestStatus.IN_PROGRESS, label: 'workflow.reopen' })
   })
 
   it('offers nothing at all on a CLOSED request', () => {

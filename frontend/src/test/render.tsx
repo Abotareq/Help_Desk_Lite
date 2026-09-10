@@ -4,6 +4,7 @@ import type { ReactElement, ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { AuthContext, type AuthContextValue } from '../features/auth/authContext'
 import { ThemeProvider } from '../features/theme/ThemeProvider'
+import { I18nProvider } from '../i18n/I18nProvider'
 import { UserRole, type User } from '../types/domain'
 
 export function makeUser(overrides: Partial<User> = {}): User {
@@ -50,11 +51,13 @@ export function renderWithProviders(ui: ReactElement, options: Options = {}) {
   function Wrapper({ children }: { children: ReactNode }) {
     return (
       <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
+        <I18nProvider>
+          <QueryClientProvider client={queryClient}>
           <MemoryRouter initialEntries={initialEntries}>
             <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
           </MemoryRouter>
-        </QueryClientProvider>
+          </QueryClientProvider>
+        </I18nProvider>
       </ThemeProvider>
     )
   }

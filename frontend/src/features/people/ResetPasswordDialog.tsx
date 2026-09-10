@@ -6,12 +6,15 @@ import { FormField } from '../../components/ui/FormField'
 import { Input } from '../../components/ui/Input'
 import { useResetPassword } from '../../hooks/useUsers'
 import type { User } from '../../types/domain'
+import { useI18n } from '../../hooks/useI18n'
 
 /**
  * v1 has no self-service recovery, so a manager doing this is the only way
  * somebody locked out gets back in.
  */
 export function ResetPasswordDialog({ user, onClose }: { user: User; onClose: () => void }) {
+  const { t } = useI18n()
+
   const resetPassword = useResetPassword()
   const [password, setPassword] = useState('')
   const [done, setDone] = useState(false)
@@ -57,7 +60,7 @@ export function ResetPasswordDialog({ user, onClose }: { user: User; onClose: ()
       {error && error.details.length === 0 ? <Alert>{error.message}</Alert> : null}
 
       <FormField
-        label="New password"
+        label={t('people.newPassword')}
         htmlFor={`reset-${user.id}`}
         error={error?.fieldError('password')}
         hint="At least 8 characters. They will need it to sign in."

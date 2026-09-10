@@ -1,6 +1,8 @@
 import { ApiError } from '../../api/client'
 import { useChangeCategory } from '../../hooks/useRequests'
-import { CATEGORY_ORDER, categoryLabel } from '../../lib/status'
+import { useI18n } from '../../hooks/useI18n'
+import { categoryKey } from '../../i18n/keys'
+import { CATEGORY_ORDER } from '../../lib/status'
 import { RequestCategory, type SupportRequest } from '../../types/domain'
 import { Alert } from '../ui/Alert'
 import { Select } from '../ui/Select'
@@ -14,19 +16,20 @@ import { Select } from '../ui/Select'
  * mirror, so a requester never sees a control the API would refuse them.
  */
 export function CategoryControl({ request }: { request: SupportRequest }) {
+  const { t } = useI18n()
   const change = useChangeCategory(request.id)
 
   return (
     <div className="space-y-2">
       <Select
-        aria-label="Category"
+        aria-label={t('detail.category')}
         value={request.category}
         disabled={change.isPending}
         onChange={(e) => change.mutate(e.target.value as RequestCategory)}
       >
         {CATEGORY_ORDER.map((category) => (
           <option key={category} value={category}>
-            {categoryLabel(category)}
+            {t(categoryKey(category))}
           </option>
         ))}
       </Select>
@@ -35,7 +38,7 @@ export function CategoryControl({ request }: { request: SupportRequest }) {
         <Alert>
           {change.error instanceof ApiError
             ? change.error.message
-            : 'Could not change the category.'}
+            : t('category.changeFailed')}
         </Alert>
       ) : null}
     </div>

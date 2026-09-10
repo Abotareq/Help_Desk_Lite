@@ -15,6 +15,7 @@ import { useUserNames } from '../../hooks/useUserNames'
 import { OPEN_STATUSES } from '../../lib/status'
 import { canClaim } from '../../lib/workflow'
 import type { SupportRequest } from '../../types/domain'
+import { useI18n } from '../../hooks/useI18n'
 
 type QueueTab = 'mine' | 'unclaimed'
 
@@ -25,6 +26,8 @@ type QueueTab = 'mine' | 'unclaimed'
  * working on" are the only two questions a handler actually opens this for.
  */
 export function QueuePage() {
+  const { t } = useI18n()
+
   const viewer = useCurrentUser()
   const [tab, setTab] = useState<QueueTab>('mine')
   const claim = useClaimRequest()
@@ -64,8 +67,8 @@ export function QueuePage() {
   return (
     <>
       <PageHeader
-        title="Queue"
-        subtitle="Highest priority first"
+        title={t('queue.title')}
+        subtitle={t('queue.subtitle')}
         actions={<Tabs tabs={tabs} active={tab} onChange={setTab} />}
       />
 
@@ -108,10 +111,10 @@ export function QueuePage() {
           <RequestTable
             trailingHeaders={
               <>
-                <th scope="col" className="w-36 py-2 pr-3 font-medium">
+                <th scope="col" className="w-36 py-2 pe-3 font-medium">
                   Requester
                 </th>
-                <th scope="col" className="w-24 py-2 pr-4 font-medium" />
+                <th scope="col" className="w-24 py-2 pe-4 font-medium" />
               </>
             }
           >
@@ -149,7 +152,7 @@ interface QueueRowActionsProps {
 function QueueRowActions({ requesterName, claimable, claiming, onClaim }: QueueRowActionsProps) {
   return (
     <>
-      <td className="whitespace-nowrap py-2 pr-3 align-middle">
+      <td className="whitespace-nowrap py-2 pe-3 align-middle">
         {requesterName ? (
           <span className="inline-flex items-center gap-1.5 text-sm text-ink-muted">
             <Avatar name={requesterName} />
@@ -159,7 +162,7 @@ function QueueRowActions({ requesterName, claimable, claiming, onClaim }: QueueR
           <span className="text-sm text-ink-subtle">—</span>
         )}
       </td>
-      <td className="whitespace-nowrap py-2 pr-4 text-right align-middle">
+      <td className="whitespace-nowrap py-2 pe-4 text-end align-middle">
         {claimable ? (
           <Button size="sm" loading={claiming} onClick={onClaim}>
             Claim

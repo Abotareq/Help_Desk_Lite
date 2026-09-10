@@ -1,27 +1,34 @@
-/** "2h ago" — compact enough for a dense table column. */
-export function timeAgo(iso: string): string {
+/**
+ * Relative time, in the reader's language.
+ *
+ * Intl does the formatting rather than a hand-built string, because "2 hours
+ * ago" has one shape in English and several in Arabic — which form applies
+ * depends on the number, and getting it wrong is the kind of mistake that reads
+ * as machine translation. `numeric: 'auto'` also gives "now" and "الآن" without
+ * a special case.
+ */
+const UNITS: [unit: Intl.RelativeTimeFormatUnit, seconds: number][] = [
+  ['year', 31_536_000],
+  ['month', 2_592_000],
+  ['day', 86_400],
+  ['hour', 3600],
+  ['minute', 60],
+]
+
+export function timeAgo(iso: string, locale: string): string {
   const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+  const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'narrow' })
 
-  if (seconds < 60) return 'just now'
-
-  const units: [label: string, seconds: number][] = [
-    ['y', 31_536_000],
-    ['mo', 2_592_000],
-    ['d', 86_400],
-    ['h', 3600],
-    ['m', 60],
-  ]
-
-  for (const [label, size] of units) {
+  for (const [unit, size] of UNITS) {
     const value = Math.floor(seconds / size)
-    if (value >= 1) return `${value}${label} ago`
+    if (value >= 1) return format.format(-value, unit)
   }
 
-  return 'just now'
+  return format.format(0, 'second')
 }
 
-export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
+export function formatDateTime(iso: string, locale: string): string {
+  return new Date(iso).toLocaleString(locale, {
     dateStyle: 'medium',
     timeStyle: 'short',
   })

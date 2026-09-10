@@ -5,32 +5,12 @@ import { RequestCategory, RequestStatus } from '../types/domain'
  * file exports only a component — which is what keeps Fast Refresh working, and
  * lets non-visual code ask for a label without importing UI.
  */
-export const STATUS_STYLES: Record<RequestStatus, { dot: string; label: string }> = {
-  [RequestStatus.NEW]: { dot: 'bg-status-new', label: 'New' },
-  [RequestStatus.IN_PROGRESS]: { dot: 'bg-status-progress', label: 'In progress' },
-  [RequestStatus.WAITING]: { dot: 'bg-status-waiting', label: 'Waiting' },
-  [RequestStatus.RESOLVED]: { dot: 'bg-status-resolved', label: 'Resolved' },
-  [RequestStatus.CLOSED]: { dot: 'bg-status-closed', label: 'Closed' },
-}
-
-export function statusLabel(status: RequestStatus): string {
-  return STATUS_STYLES[status].label
-}
-
-/**
- * Categories read as words rather than as the constants they are stored as.
- * FACILITIES in a sentence — "moved it from IT to FACILITIES" — reads as
- * shouting, and the raw value is a storage detail people should not have to see.
- */
-export const CATEGORY_LABELS: Record<RequestCategory, string> = {
-  [RequestCategory.IT]: 'IT',
-  [RequestCategory.HR]: 'HR',
-  [RequestCategory.FACILITIES]: 'Facilities',
-  [RequestCategory.OTHER]: 'Other',
-}
-
-export function categoryLabel(category: RequestCategory): string {
-  return CATEGORY_LABELS[category]
+export const STATUS_STYLES: Record<RequestStatus, { dot: string }> = {
+  [RequestStatus.NEW]: { dot: 'bg-status-new' },
+  [RequestStatus.IN_PROGRESS]: { dot: 'bg-status-progress' },
+  [RequestStatus.WAITING]: { dot: 'bg-status-waiting' },
+  [RequestStatus.RESOLVED]: { dot: 'bg-status-resolved' },
+  [RequestStatus.CLOSED]: { dot: 'bg-status-closed' },
 }
 
 /** The fixed list, in the order the form and the filters offer it. */

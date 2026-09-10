@@ -7,8 +7,11 @@ import { FormField } from '../../components/ui/FormField'
 import { Input } from '../../components/ui/Input'
 import { Spinner } from '../../components/ui/Spinner'
 import { useAuth } from '../../hooks/useAuth'
+import { useI18n } from '../../hooks/useI18n'
 
 export function SignInPage() {
+  const { t } = useI18n()
+
   const { user, initialising, signIn } = useAuth()
   const location = useLocation()
 
@@ -53,8 +56,8 @@ export function SignInPage() {
           <div className="mx-auto mb-3 flex size-9 items-center justify-center rounded-lg bg-brand text-sm font-bold text-on-brand">
             H
           </div>
-          <h1 className="text-base font-semibold text-ink">HelpDesk Lite</h1>
-          <p className="mt-0.5 text-sm text-ink-muted">Sign in to submit and track requests</p>
+          <h1 className="text-base font-semibold text-ink">{t('app.name')}</h1>
+          <p className="mt-0.5 text-sm text-ink-muted">{t('signIn.title')}</p>
         </div>
 
         <form
@@ -64,7 +67,7 @@ export function SignInPage() {
         >
           {error ? <Alert>{error.message}</Alert> : null}
 
-          <FormField label="Email" htmlFor="email" error={error?.fieldError('email')}>
+          <FormField label={t('signIn.email')} htmlFor="email" error={error?.fieldError('email')}>
             <Input
               id="email"
               type="email"
@@ -73,11 +76,11 @@ export function SignInPage() {
               value={email}
               invalid={Boolean(error?.fieldError('email'))}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
+              placeholder={t('signIn.emailPlaceholder')}
             />
           </FormField>
 
-          <FormField label="Password" htmlFor="password" error={error?.fieldError('password')}>
+          <FormField label={t('signIn.password')} htmlFor="password" error={error?.fieldError('password')}>
             <Input
               id="password"
               type="password"

@@ -1,3 +1,4 @@
+import type { MessageKey } from '../i18n/en'
 import { RequestStatus, UserRole, type SupportRequest, type User } from '../types/domain'
 
 /**
@@ -18,41 +19,45 @@ interface Transition {
   to: RequestStatus
   allowed: readonly Relation[]
   isReopen?: boolean
-  /** Verb shown on the button, rather than the raw target status. */
-  label: string
+  /**
+   * Message key for the verb on the button, rather than the raw target status.
+   * A key rather than the text itself, so the table stays the single statement
+   * of what the workflow is and the words come from the reader's catalogue.
+   */
+  label: MessageKey
 }
 
 const HANDLER: readonly Relation[] = ['ASSIGNEE', 'MANAGER']
 
 export const TRANSITIONS: readonly Transition[] = [
-  { from: RequestStatus.NEW, to: RequestStatus.IN_PROGRESS, allowed: HANDLER, label: 'Start work' },
+  { from: RequestStatus.NEW, to: RequestStatus.IN_PROGRESS, allowed: HANDLER, label: 'workflow.startWork' },
   {
     from: RequestStatus.NEW,
     to: RequestStatus.CLOSED,
     allowed: ['REQUESTER', 'MANAGER'],
-    label: 'Withdraw',
+    label: 'workflow.withdraw',
   },
-  { from: RequestStatus.IN_PROGRESS, to: RequestStatus.WAITING, allowed: HANDLER, label: 'Wait on requester' },
-  { from: RequestStatus.IN_PROGRESS, to: RequestStatus.RESOLVED, allowed: HANDLER, label: 'Resolve' },
+  { from: RequestStatus.IN_PROGRESS, to: RequestStatus.WAITING, allowed: HANDLER, label: 'workflow.wait' },
+  { from: RequestStatus.IN_PROGRESS, to: RequestStatus.RESOLVED, allowed: HANDLER, label: 'workflow.resolve' },
   {
     from: RequestStatus.WAITING,
     to: RequestStatus.IN_PROGRESS,
     allowed: [...HANDLER, 'REQUESTER'],
-    label: 'Resume',
+    label: 'workflow.resume',
   },
-  { from: RequestStatus.WAITING, to: RequestStatus.RESOLVED, allowed: HANDLER, label: 'Resolve' },
+  { from: RequestStatus.WAITING, to: RequestStatus.RESOLVED, allowed: HANDLER, label: 'workflow.resolve' },
   {
     from: RequestStatus.RESOLVED,
     to: RequestStatus.IN_PROGRESS,
     allowed: ['REQUESTER', ...HANDLER],
     isReopen: true,
-    label: 'Reopen',
+    label: 'workflow.reopen',
   },
   {
     from: RequestStatus.RESOLVED,
     to: RequestStatus.CLOSED,
     allowed: ['REQUESTER', ...HANDLER],
-    label: 'Close',
+    label: 'workflow.close',
   },
 ]
 
@@ -67,7 +72,7 @@ export function relationsOf(request: SupportRequest, viewer: User): Set<Relation
 
 export interface AvailableAction {
   to: RequestStatus
-  label: string
+  label: MessageKey
   isReopen: boolean
 }
 

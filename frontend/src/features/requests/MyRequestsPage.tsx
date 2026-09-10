@@ -9,8 +9,11 @@ import { Spinner } from '../../components/ui/Spinner'
 import { useCurrentUser } from '../../hooks/useAuth'
 import { useRequestList } from '../../hooks/useRequests'
 import { ApiError } from '../../api/client'
+import { useI18n } from '../../hooks/useI18n'
 
 export function MyRequestsPage() {
+  const { t } = useI18n()
+
   const user = useCurrentUser()
 
   // Scoped by requester rather than trusting the API's own scoping, so an agent
@@ -25,7 +28,7 @@ export function MyRequestsPage() {
   return (
     <>
       <PageHeader
-        title="My requests"
+        title={t('myRequests.title')}
         subtitle={data ? `${data.total} total` : undefined}
         actions={
           <Link to="/requests/new">
@@ -49,7 +52,7 @@ export function MyRequestsPage() {
           </div>
         ) : data.items.length === 0 ? (
           <EmptyState
-            title="You have not submitted anything yet"
+            title={t('myRequests.empty')}
             description="When you need help with a laptop, an account, the building or anything else, raise it here so it does not get lost in a chat thread."
             action={
               <Link to="/requests/new">

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useSidebar } from '../layout/sidebarContext'
+import { useI18n } from '../../hooks/useI18n'
 
 interface PageHeaderProps {
   title: string
@@ -9,6 +10,8 @@ interface PageHeaderProps {
 
 /** The thin breadcrumb-style bar at the top of every screen, as Frappe does it. */
 export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
+  const { t } = useI18n()
+
   const sidebar = useSidebar()
 
   return (
@@ -19,8 +22,8 @@ export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
           <button
             type="button"
             onClick={sidebar.toggle}
-            aria-label="Open navigation"
-            className="-ml-1 shrink-0 rounded p-1 text-ink-muted hover:bg-canvas hover:text-ink"
+            aria-label={t('nav.open')}
+            className="-ms-1 shrink-0 rounded p-1 text-ink-muted hover:bg-canvas hover:text-ink"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path
