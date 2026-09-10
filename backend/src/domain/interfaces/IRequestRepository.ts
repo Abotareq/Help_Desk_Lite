@@ -17,6 +17,7 @@ export interface CreateRequestData {
 /** Fields a service may change on an existing request. */
 export interface UpdateRequestData {
   status?: RequestStatus;
+  category?: RequestCategory;
   assigneeId?: string | null;
   resolvedAt?: Date | null;
   closedAt?: Date | null;

@@ -67,6 +67,13 @@ export function claimRequest(id: string): Promise<SupportRequest> {
   )
 }
 
+export function changeCategory(id: string, category: RequestCategory): Promise<SupportRequest> {
+  return apiFetch<{ request: SupportRequest }>(`/requests/${id}/category`, {
+    method: 'PATCH',
+    body: { category },
+  }).then((r) => r.request)
+}
+
 export function assignRequest(id: string, assigneeId: string | null): Promise<SupportRequest> {
   return apiFetch<{ request: SupportRequest }>(`/requests/${id}/assign`, {
     method: 'PATCH',

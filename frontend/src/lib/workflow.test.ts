@@ -9,6 +9,7 @@ import { RequestStatus, UserRole, type SupportRequest, type User } from '../type
 import {
   TRANSITIONS,
   availableActions,
+  canChangeCategory,
   canClaim,
   canComment,
   canWriteInternalNote,
@@ -245,5 +246,40 @@ describe('canWriteInternalNote', () => {
     const own = requestWith({ requesterId: agent.id, assigneeId: otherAgent.id })
 
     expect(canWriteInternalNote(own, agent)).toBe(false)
+  })
+})
+
+/**
+ * Mirrors RequestService.changeCategory. Same reason as the transitions: the UI
+ * must never offer a control the API would refuse, or the person learns the rule
+ * from a 403 instead of from what is on screen.
+ */
+describe('canChangeCategory', () => {
+  it('lets the assignee correct it', () => {
+    expect(canChangeCategory(requestWith({ assigneeId: agent.id }), agent)).toBe(true)
+  })
+
+  it('lets a manager correct it on any request', () => {
+    expect(canChangeCategory(requestWith({ assigneeId: agent.id }), manager)).toBe(true)
+  })
+
+  // The person who picked the wrong category does not get to overrule the
+  // handler who fixed it.
+  it('refuses the requester, who chose it in the first place', () => {
+    expect(canChangeCategory(requestWith({ assigneeId: agent.id }), employee)).toBe(false)
+  })
+
+  it('refuses an agent who has not claimed the request', () => {
+    expect(canChangeCategory(requestWith(), otherAgent)).toBe(false)
+  })
+
+  it('refuses everyone once the request is closed', () => {
+    const closed = requestWith({ status: RequestStatus.CLOSED, assigneeId: agent.id })
+
+    expect([agent, manager, employee].map((v) => canChangeCategory(closed, v))).toEqual([
+      false,
+      false,
+      false,
+    ])
   })
 })

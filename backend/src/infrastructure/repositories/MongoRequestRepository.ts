@@ -72,6 +72,7 @@ export class MongoRequestRepository implements IRequestRepository {
 
     const $set: Record<string, unknown> = {};
     if (data.status !== undefined) $set.status = data.status;
+    if (data.category !== undefined) $set.category = data.category;
     if (data.assigneeId !== undefined) {
       $set.assigneeId = data.assigneeId === null ? null : new Types.ObjectId(data.assigneeId);
     }
@@ -217,6 +218,8 @@ function toHistorySubdocument(entry: RequestHistoryEntry) {
     fromStatus: entry.fromStatus,
     toStatus: entry.toStatus,
     actorId: new Types.ObjectId(entry.actorId),
+    ...(entry.fromCategory ? { fromCategory: entry.fromCategory } : {}),
+    ...(entry.toCategory ? { toCategory: entry.toCategory } : {}),
     ...(entry.note ? { note: entry.note } : {}),
     at: entry.at,
   };
@@ -238,6 +241,8 @@ function toDomain(doc: RequestHydrated): SupportRequest {
       fromStatus: h.fromStatus,
       toStatus: h.toStatus,
       actorId: h.actorId.toString(),
+      ...(h.fromCategory ? { fromCategory: h.fromCategory } : {}),
+      ...(h.toCategory ? { toCategory: h.toCategory } : {}),
       ...(h.note ? { note: h.note } : {}),
       at: h.at,
     })),

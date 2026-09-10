@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { ApiError } from '../../api/client'
 import { AssignControl } from '../../components/requests/AssignControl'
+import { CategoryControl } from '../../components/requests/CategoryControl'
 import { CommentForm } from '../../components/requests/CommentForm'
 import { StatusActions } from '../../components/requests/StatusActions'
 import { Timeline } from '../../components/requests/Timeline'
@@ -23,7 +24,8 @@ import {
 } from '../../hooks/useRequests'
 import { useUserNames } from '../../hooks/useUserNames'
 import { formatDateTime } from '../../lib/time'
-import { canClaim, canComment } from '../../lib/workflow'
+import { categoryLabel } from '../../lib/status'
+import { canChangeCategory, canClaim, canComment } from '../../lib/workflow'
 import { UserRole } from '../../types/domain'
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -163,9 +165,16 @@ export function RequestDetailPage() {
                 <Field label="Priority">
                   <PriorityBadge priority={request.priority} />
                 </Field>
-                <Field label="Category">
-                  <Badge>{request.category}</Badge>
-                </Field>
+                {canChangeCategory(request, viewer) ? (
+                  <div className="px-4 py-2">
+                    <p className="mb-1.5 text-sm text-ink-muted">Category</p>
+                    <CategoryControl request={request} />
+                  </div>
+                ) : (
+                  <Field label="Category">
+                    <Badge>{categoryLabel(request.category)}</Badge>
+                  </Field>
+                )}
                 {viewer.role === UserRole.MANAGER ? (
                   <div className="px-4 py-2">
                     <p className="mb-1.5 text-sm text-ink-muted">Assigned to</p>

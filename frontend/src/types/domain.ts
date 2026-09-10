@@ -41,6 +41,7 @@ export type HistoryEventType =
   | 'ASSIGNED'
   | 'UNASSIGNED'
   | 'REOPENED'
+  | 'CATEGORY_CHANGED'
 
 export interface User {
   id: string
@@ -57,6 +58,9 @@ export interface RequestHistoryEntry {
   fromStatus: RequestStatus | null
   toStatus: RequestStatus
   actorId: string
+  /** Set only on CATEGORY_CHANGED — structured so the sentence is built here. */
+  fromCategory?: RequestCategory
+  toCategory?: RequestCategory
   note?: string
   at: string
 }

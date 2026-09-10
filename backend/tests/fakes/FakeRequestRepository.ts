@@ -84,6 +84,7 @@ export class FakeRequestRepository implements IRequestRepository {
     if (!existing) return null;
 
     if (data.status !== undefined) existing.status = data.status;
+    if (data.category !== undefined) existing.category = data.category;
     if (data.assigneeId !== undefined) existing.assigneeId = data.assigneeId;
     if (data.resolvedAt !== undefined) existing.resolvedAt = data.resolvedAt;
     if (data.closedAt !== undefined) existing.closedAt = data.closedAt;

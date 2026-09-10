@@ -58,6 +58,15 @@ export class RequestController {
     res.status(200).json({ request });
   };
 
+  changeCategory = async (req: Request, res: Response): Promise<void> => {
+    const request = await this.requestService.changeCategory(
+      req.params.id as string,
+      req.body.category,
+      requireUser(req),
+    );
+    res.status(200).json({ request });
+  };
+
   getHistory = async (req: Request, res: Response): Promise<void> => {
     const history = await this.requestService.getHistory(req.params.id as string, requireUser(req));
     res.status(200).json({ history, total: history.length });
