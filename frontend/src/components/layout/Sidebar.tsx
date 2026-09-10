@@ -67,7 +67,7 @@ export function Sidebar({ user, onSignOut, open, onClose }: SidebarProps) {
         )}
       >
         <div className="flex h-12 items-center gap-2 px-3">
-          <div className="flex size-6 shrink-0 items-center justify-center rounded bg-brand text-xs font-bold text-white">
+          <div className="flex size-6 shrink-0 items-center justify-center rounded bg-brand text-xs font-bold text-on-brand">
             H
           </div>
           <span className="truncate text-sm font-semibold text-ink">HelpDesk Lite</span>

@@ -19,6 +19,13 @@
   --color-brand: #4f46e5;
   --color-brand-hover: #4338ca;
   --color-brand-soft: #eef2ff;
+  /*
+   * Foreground for anything sitting on a brand fill. Its own token because the
+   * brand is dark in this theme and light in the other, so a hard-coded white
+   * label is legible in one and 3.1:1 in the other — on the primary button,
+   * which is the most-clicked text in the product.
+   */
+  --color-on-brand: #ffffff;
 
   /* One colour per request status, used by the dot and the badge alike. */
   --color-status-new: #e11d48;
@@ -78,6 +85,7 @@
   --color-brand: #8b83f7;
   --color-brand-hover: #a49dff;
   --color-brand-soft: #24223a;
+  --color-on-brand: #16161a;
 
   --color-status-new: #fb7185;
   --color-status-progress: #60a5fa;
