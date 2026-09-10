@@ -1,12 +1,8 @@
 import { useTheme } from '../../hooks/useTheme'
+import { useI18n } from '../../hooks/useI18n'
+import { themeKey } from '../../i18n/keys'
 import { cn } from '../../lib/cn'
-import { THEME_PREFERENCES, type ThemePreference } from '../../features/theme/themeContext'
-
-const LABELS: Record<ThemePreference, string> = {
-  light: 'Light',
-  dark: 'Dark',
-  system: 'Auto',
-}
+import { THEME_PREFERENCES } from '../../features/theme/themeContext'
 
 /**
  * Three states rather than a switch, because "follow the system" is a real
@@ -19,11 +15,12 @@ const LABELS: Record<ThemePreference, string> = {
  */
 export function ThemeToggle() {
   const { preference, setPreference } = useTheme()
+  const { t } = useI18n()
 
   return (
     <div
       role="radiogroup"
-      aria-label="Colour theme"
+      aria-label={t('theme.label')}
       className="flex rounded-md border border-line bg-surface p-0.5"
     >
       {THEME_PREFERENCES.map((option) => {
@@ -43,7 +40,7 @@ export function ThemeToggle() {
                 : 'text-ink-subtle hover:bg-line/60 hover:text-ink-muted',
             )}
           >
-            {LABELS[option]}
+            {t(themeKey(option))}
           </button>
         )
       })}

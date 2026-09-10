@@ -8,11 +8,17 @@ import { Select } from '../../components/ui/Select'
 import { useCreateUser } from '../../hooks/useUsers'
 import { UserRole } from '../../types/domain'
 import { useI18n } from '../../hooks/useI18n'
+import type { MessageKey } from '../../i18n/en'
 
-const ROLE_HINTS: Record<UserRole, string> = {
-  [UserRole.EMPLOYEE]: 'Submits requests and tracks their own',
-  [UserRole.AGENT]: 'Support staff — claims, works and resolves requests',
-  [UserRole.MANAGER]: 'Sees everything, assigns work, manages accounts',
+/**
+ * Keys, not text: a map at module scope has no hook to call, and the sentence
+ * explaining what a role actually does is exactly the part someone needs in
+ * their own language.
+ */
+const ROLE_HINTS: Record<UserRole, MessageKey> = {
+  [UserRole.EMPLOYEE]: 'people.roleEmployeeHint',
+  [UserRole.AGENT]: 'people.roleAgentHint',
+  [UserRole.MANAGER]: 'people.roleManagerHint',
 }
 
 /** v1 has no self sign-up, so this is the only way an account comes into being. */
@@ -62,7 +68,7 @@ export function NewUserForm({ onDone }: { onDone: () => void }) {
           label={t('people.role')}
           htmlFor="new-role"
           error={error?.fieldError('role')}
-          hint={ROLE_HINTS[role]}
+          hint={t(ROLE_HINTS[role])}
         >
           <Select id="new-role" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
             {Object.values(UserRole).map((value) => (
@@ -91,10 +97,10 @@ export function NewUserForm({ onDone }: { onDone: () => void }) {
 
       <div className="flex gap-2">
         <Button type="submit" variant="primary" size="sm" loading={createUser.isPending}>
-          Create account
+          {t('people.createAccount')}
         </Button>
         <Button size="sm" onClick={onDone} disabled={createUser.isPending}>
-          Cancel
+          {t('common.cancel')}
         </Button>
       </div>
     </form>

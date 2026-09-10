@@ -33,7 +33,7 @@ export function MyRequestsPage() {
         actions={
           <Link to="/requests/new">
             <Button variant="primary" size="sm">
-              New request
+              {t('requests.newRequest')}
             </Button>
           </Link>
         }
@@ -47,7 +47,7 @@ export function MyRequestsPage() {
         ) : error ? (
           <div className="p-4">
             <Alert>
-              {error instanceof ApiError ? error.message : 'Could not load your requests.'}
+              {error instanceof ApiError ? error.message : t('myRequests.loadFailed')}
             </Alert>
           </div>
         ) : data.items.length === 0 ? (
@@ -57,7 +57,7 @@ export function MyRequestsPage() {
             action={
               <Link to="/requests/new">
                 <Button variant="primary" size="sm">
-                  Submit your first request
+                  {t('myRequests.submitFirst')}
                 </Button>
               </Link>
             }

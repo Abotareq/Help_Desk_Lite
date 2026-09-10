@@ -73,7 +73,7 @@ export function DashboardPage() {
         <PageHeader title={t('dashboard.title')} />
         <div className="p-4">
           <Alert>
-            {error instanceof ApiError ? error.message : 'Could not load the dashboard.'}
+            {error instanceof ApiError ? error.message : t('dashboard.loadFailed')}
           </Alert>
         </div>
       </>
@@ -140,8 +140,8 @@ export function DashboardPage() {
                     >
                       {row.assigneeId ? (
                         <span className="inline-flex items-center gap-2 text-sm text-ink">
-                          <Avatar name={name ?? 'Unknown'} />
-                          {name ?? 'Unknown user'}
+                          <Avatar name={name ?? t('common.unknown')} />
+                          {name ?? t('common.unknownUser')}
                           {row.assigneeId === viewer.id ? (
                             <span className="text-xs text-ink-subtle">(you)</span>
                           ) : null}
@@ -151,7 +151,7 @@ export function DashboardPage() {
                           to="/all?assignee=unassigned"
                           className="text-sm text-status-waiting hover:underline"
                         >
-                          Unclaimed
+                          {t('dashboard.unclaimed')}
                         </Link>
                       )}
                       <span className="text-sm tabular-nums text-ink">{row.count}</span>

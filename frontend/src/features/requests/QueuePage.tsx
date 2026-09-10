@@ -55,8 +55,8 @@ export function QueuePage() {
   const active = tab === 'mine' ? mine : unclaimed
 
   const tabs: TabDefinition<QueueTab>[] = [
-    { id: 'mine', label: 'My work', count: mine.data?.total },
-    { id: 'unclaimed', label: 'Unclaimed', count: unclaimed.data?.total },
+    { id: 'mine', label: t('queue.myWork'), count: mine.data?.total },
+    { id: 'unclaimed', label: t('detail.unclaimed'), count: unclaimed.data?.total },
   ]
 
   const names = useUserNames(
@@ -76,7 +76,7 @@ export function QueuePage() {
         {claim.isError ? (
           <div className="p-4 pb-0">
             <Alert>
-              {claim.error instanceof ApiError ? claim.error.message : 'Could not claim that request.'}
+              {claim.error instanceof ApiError ? claim.error.message : t('queue.claimFailed')}
             </Alert>
           </div>
         ) : null}
@@ -88,21 +88,21 @@ export function QueuePage() {
         ) : active.error ? (
           <div className="p-4">
             <Alert>
-              {active.error instanceof ApiError ? active.error.message : 'Could not load the queue.'}
+              {active.error instanceof ApiError ? active.error.message : t('queue.loadFailed')}
             </Alert>
           </div>
         ) : active.data.items.length === 0 ? (
           <EmptyState
-            title={tab === 'mine' ? 'You have not claimed anything yet' : 'Nothing waiting to be picked up'}
+            title={tab === 'mine' ? t('queue.emptyMine') : t('queue.emptyUnclaimed')}
             description={
               tab === 'mine'
-                ? 'Claim something from the unclaimed tab to start working it.'
-                : 'Every open request already has an owner. That is the queue doing its job.'
+                ? t('queue.claimFromUnclaimed')
+                : t('queue.allOwned')
             }
             action={
               tab === 'mine' ? (
                 <Button size="sm" onClick={() => setTab('unclaimed')}>
-                  See unclaimed
+                  {t('queue.seeUnclaimed')}
                 </Button>
               ) : undefined
             }
@@ -112,7 +112,7 @@ export function QueuePage() {
             trailingHeaders={
               <>
                 <th scope="col" className="w-36 py-2 pe-3 font-medium">
-                  Requester
+                  {t('requests.colRequester')}
                 </th>
                 <th scope="col" className="w-24 py-2 pe-4 font-medium" />
               </>
@@ -150,6 +150,8 @@ interface QueueRowActionsProps {
 
 /** Requester and the claim control, so work can be picked up without opening it. */
 function QueueRowActions({ requesterName, claimable, claiming, onClaim }: QueueRowActionsProps) {
+  const { t } = useI18n()
+
   return (
     <>
       <td className="whitespace-nowrap py-2 pe-3 align-middle">
@@ -165,7 +167,7 @@ function QueueRowActions({ requesterName, claimable, claiming, onClaim }: QueueR
       <td className="whitespace-nowrap py-2 pe-4 text-end align-middle">
         {claimable ? (
           <Button size="sm" loading={claiming} onClick={onClaim}>
-            Claim
+            {t('queue.claim')}
           </Button>
         ) : null}
       </td>

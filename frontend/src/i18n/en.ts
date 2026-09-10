@@ -174,6 +174,63 @@ export const en = {
   'newRequest.what': 'What do you need?',
   'newRequest.details': 'Details',
 
+  'common.cancel': 'Cancel',
+  'common.dismiss': 'Dismiss',
+  'common.done': 'Done',
+  'common.previous': 'Previous',
+  'common.next': 'Next',
+  'common.unknown': 'Unknown',
+  'common.unknownUser': 'Unknown user',
+
+  'signIn.networkError': 'Could not reach the server',
+
+  'newRequest.submit': 'Submit request',
+  'newRequest.catIT': 'IT — laptops, software, accounts, network',
+  'newRequest.catHR': 'HR — payroll, leave, benefits',
+  'newRequest.catFACILITIES': 'Facilities — desks, building, equipment',
+  'newRequest.catOTHER': 'Something else',
+  'newRequest.priLOW': 'Low — whenever someone gets to it',
+  'newRequest.priMEDIUM': 'Medium — normal',
+  'newRequest.priHIGH': 'High — I am blocked',
+
+  'myRequests.submitFirst': 'Submit your first request',
+  'myRequests.loadFailed': 'Could not load your requests.',
+
+  'dashboard.loadFailed': 'Could not load the dashboard.',
+
+  'allRequests.loadFailed': 'Could not load requests.',
+  'allRequests.clearFilters': 'Clear filters',
+  'allRequests.owner': 'Owner',
+  'filters.tryWidening': 'Try widening one of them.',
+  'filters.noneRaised': 'No requests have been raised yet.',
+
+  'queue.myWork': 'My work',
+  'queue.claim': 'Claim',
+  'queue.claimFailed': 'Could not claim that request.',
+  'queue.loadFailed': 'Could not load the queue.',
+  'queue.emptyMine': 'You have not claimed anything yet',
+  'queue.emptyUnclaimed': 'Nothing waiting to be picked up',
+  'queue.allOwned': 'Every open request already has an owner. That is the queue doing its job.',
+  'queue.seeUnclaimed': 'See unclaimed',
+
+  'people.addPerson': 'Add person',
+  'people.createAccount': 'Create account',
+  'people.resetPassword': 'Reset password',
+  'people.deactivate': 'Deactivate',
+  'people.reactivate': 'Reactivate',
+  'people.status': 'Status',
+  'people.you': 'You',
+  'people.lastManager': 'Last manager',
+  'people.cannotDeactivateSelf': 'You cannot deactivate your own account',
+  'people.lastManagerLocked': 'The last active manager cannot be deactivated',
+  'people.updateFailed': 'Could not update that account.',
+  'people.loadFailed': 'Could not load people.',
+  'people.roleEmployeeHint': 'Submits requests and tracks their own',
+  'people.roleAgentHint': 'Support staff — claims, works and resolves requests',
+  'people.roleManagerHint': 'Sees everything, assigns work, manages accounts',
+
+  'queue.claimFromUnclaimed': 'Claim something from the unclaimed tab to start working it.',
+
   'common.loading': 'Loading',
   'common.retry': 'Try again',
 } as const satisfies Record<string, Message>

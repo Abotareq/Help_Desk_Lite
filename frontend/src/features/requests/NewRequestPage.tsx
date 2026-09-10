@@ -11,18 +11,24 @@ import { Textarea } from '../../components/ui/Textarea'
 import { useCreateRequest } from '../../hooks/useRequests'
 import { RequestCategory, RequestPriority } from '../../types/domain'
 import { useI18n } from '../../hooks/useI18n'
+import type { MessageKey } from '../../i18n/en'
 
-const CATEGORY_LABELS: Record<RequestCategory, string> = {
-  [RequestCategory.IT]: 'IT — laptops, software, accounts, network',
-  [RequestCategory.HR]: 'HR — payroll, leave, benefits',
-  [RequestCategory.FACILITIES]: 'Facilities — desks, building, equipment',
-  [RequestCategory.OTHER]: 'Something else',
+/**
+ * The descriptive half of each option. Keys rather than text: these are the
+ * words that tell someone which category they are actually in, so they are
+ * exactly what has to be readable in the reader's own language.
+ */
+const CATEGORY_HINTS: Record<RequestCategory, MessageKey> = {
+  [RequestCategory.IT]: 'newRequest.catIT',
+  [RequestCategory.HR]: 'newRequest.catHR',
+  [RequestCategory.FACILITIES]: 'newRequest.catFACILITIES',
+  [RequestCategory.OTHER]: 'newRequest.catOTHER',
 }
 
-const PRIORITY_LABELS: Record<RequestPriority, string> = {
-  [RequestPriority.LOW]: 'Low — whenever someone gets to it',
-  [RequestPriority.MEDIUM]: 'Medium — normal',
-  [RequestPriority.HIGH]: 'High — I am blocked',
+const PRIORITY_HINTS: Record<RequestPriority, MessageKey> = {
+  [RequestPriority.LOW]: 'newRequest.priLOW',
+  [RequestPriority.MEDIUM]: 'newRequest.priMEDIUM',
+  [RequestPriority.HIGH]: 'newRequest.priHIGH',
 }
 
 /**
@@ -106,7 +112,7 @@ export function NewRequestPage() {
                   </option>
                   {Object.values(RequestCategory).map((value) => (
                     <option key={value} value={value}>
-                      {CATEGORY_LABELS[value]}
+                      {t(CATEGORY_HINTS[value])}
                     </option>
                   ))}
                 </Select>
@@ -120,7 +126,7 @@ export function NewRequestPage() {
                 >
                   {Object.values(RequestPriority).map((value) => (
                     <option key={value} value={value}>
-                      {PRIORITY_LABELS[value]}
+                      {t(PRIORITY_HINTS[value])}
                     </option>
                   ))}
                 </Select>
@@ -134,10 +140,10 @@ export function NewRequestPage() {
                 loading={createRequest.isPending}
                 disabled={!category}
               >
-                Submit request
+                {t('newRequest.submit')}
               </Button>
               <Button onClick={() => navigate('/')} disabled={createRequest.isPending}>
-                Cancel
+                {t('common.cancel')}
               </Button>
             </div>
           </div>

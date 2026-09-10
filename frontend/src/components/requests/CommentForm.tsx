@@ -63,7 +63,7 @@ export function CommentForm({ request, viewer, pending, error, onPost }: Comment
               onChange={(e) => setIsInternal(e.target.checked)}
               className="size-4 rounded border-line-strong accent-priority-medium"
             />
-            Internal note
+            {t('timeline.internalNote')}
           </label>
         ) : (
           <span />

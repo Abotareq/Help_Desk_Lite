@@ -74,7 +74,7 @@ export function AllRequestsPage() {
         actions={
           activeFilters.length > 0 ? (
             <Button size="sm" onClick={() => setParams(new URLSearchParams(), { replace: true })}>
-              Clear filters
+              {t('allRequests.clearFilters')}
             </Button>
           ) : undefined
         }
@@ -147,7 +147,7 @@ export function AllRequestsPage() {
         ) : error ? (
           <div className="p-4">
             <Alert>
-              {error instanceof ApiError ? error.message : 'Could not load requests.'}
+              {error instanceof ApiError ? error.message : t('allRequests.loadFailed')}
             </Alert>
           </div>
         ) : data.items.length === 0 ? (
@@ -155,8 +155,8 @@ export function AllRequestsPage() {
             title={t('filters.noMatch')}
             description={
               activeFilters.length > 0
-                ? 'Try widening one of them.'
-                : 'No requests have been raised yet.'
+                ? t('filters.tryWidening')
+                : t('filters.noneRaised')
             }
           />
         ) : (
@@ -164,7 +164,7 @@ export function AllRequestsPage() {
             <RequestTable
               trailingHeaders={
                 <th scope="col" className="w-36 py-2 pe-4 font-medium">
-                  Owner
+                  {t('allRequests.owner')}
                 </th>
               }
             >
@@ -188,14 +188,14 @@ export function AllRequestsPage() {
                     disabled={data.page <= 1}
                     onClick={() => setFilter('page', String(data.page - 1))}
                   >
-                    Previous
+                    {t('common.previous')}
                   </Button>
                   <Button
                     size="sm"
                     disabled={data.page >= lastPage}
                     onClick={() => setFilter('page', String(data.page + 1))}
                   >
-                    Next
+                    {t('common.next')}
                   </Button>
                 </div>
               </div>

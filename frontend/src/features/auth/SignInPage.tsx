@@ -43,7 +43,7 @@ export function SignInPage() {
     } catch (err) {
       // The API's own message is more useful than a generic one: it
       // distinguishes a bad credential from a deactivated account.
-      setError(err instanceof ApiError ? err : new ApiError(0, 'NETWORK', 'Could not reach the server'))
+      setError(err instanceof ApiError ? err : new ApiError(0, 'NETWORK', t('signIn.networkError')))
     } finally {
       setSubmitting(false)
     }
@@ -92,12 +92,12 @@ export function SignInPage() {
           </FormField>
 
           <Button type="submit" variant="primary" loading={submitting} className="w-full">
-            Sign in
+            {t('signIn.submit')}
           </Button>
         </form>
 
         <p className="mt-4 text-center text-xs text-ink-subtle">
-          Accounts are created by a manager — there is no self sign-up.
+          {t('signIn.noSelfSignUp')}
         </p>
       </div>
     </div>
