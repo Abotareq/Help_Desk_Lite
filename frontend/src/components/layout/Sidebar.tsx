@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { ThemeToggle } from './ThemeToggle'
 import { Avatar } from '../ui/Avatar'
 import { Button } from '../ui/Button'
 import { cn } from '../../lib/cn'
@@ -56,7 +57,7 @@ export function Sidebar({ user, onSignOut, open, onClose }: SidebarProps) {
         type="button"
         aria-label="Close navigation"
         onClick={onClose}
-        className="fixed inset-0 z-20 bg-ink/20 md:hidden"
+        className="fixed inset-0 z-20 bg-scrim/40 md:hidden"
       />
 
       <aside
@@ -114,6 +115,10 @@ export function Sidebar({ user, onSignOut, open, onClose }: SidebarProps) {
         </nav>
 
         <div className="border-t border-line p-2">
+          <div className="px-1 pb-2">
+            <ThemeToggle />
+          </div>
+
           <div className="flex items-center gap-2 px-1 py-1">
             <Avatar name={user.name} />
             <div className="min-w-0 flex-1">

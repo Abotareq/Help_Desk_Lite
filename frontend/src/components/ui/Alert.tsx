@@ -4,8 +4,8 @@ import { cn } from '../../lib/cn'
 type Tone = 'error' | 'warning' | 'info'
 
 const TONES: Record<Tone, string> = {
-  error: 'border-red-200 bg-red-50 text-red-800',
-  warning: 'border-amber-200 bg-amber-50 text-amber-900',
+  error: 'border-danger-border bg-danger-surface text-danger-ink',
+  warning: 'border-warning-border bg-warning-surface text-warning-ink',
   info: 'border-line bg-canvas text-ink-muted',
 }
 
