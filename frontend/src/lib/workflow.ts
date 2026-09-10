@@ -107,6 +107,20 @@ export function canWriteInternalNote(request: SupportRequest, viewer: User): boo
 }
 
 /**
+ * Mirrors RequestService.changeCategory. Whoever raises a request picks from a
+ * fixed list and regularly picks wrong; the handler who picks it up is the one
+ * who knows where it belongs. The requester is deliberately not offered the
+ * control — the API refuses them, and offering it would teach that rule with a
+ * 403 instead of with the absence of a dropdown.
+ */
+export function canChangeCategory(request: SupportRequest, viewer: User): boolean {
+  if (isTerminal(request.status)) return false
+
+  const relations = relationsOf(request, viewer)
+  return relations.has('ASSIGNEE') || relations.has('MANAGER')
+}
+
+/**
  * Agents only. Managers direct the work rather than doing it — they assign it,
  * or move its status, but the queue belongs to the agents.
  */

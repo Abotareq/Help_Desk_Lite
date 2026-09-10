@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AddCommentSchema } from '../../application/dtos/AddCommentSchema';
 import { AssignRequestSchema, ListMyRequestsSchema } from '../../application/dtos/AssignRequestSchema';
+import { ChangeCategorySchema } from '../../application/dtos/ChangeCategorySchema';
 import { CreateRequestSchema, RequestIdSchema } from '../../application/dtos/CreateRequestSchema';
 import { ListRequestsSchema, RequestStatsSchema } from '../../application/dtos/ListRequestsSchema';
 import { UpdateStatusSchema } from '../../application/dtos/UpdateStatusSchema';
@@ -45,6 +46,14 @@ export function buildRequestRoutes(controller: RequestController): Router {
   // No role gate here: who may move a request depends on their relationship to
   // it (requester, assignee, manager), which only the service can see.
   router.patch('/:id/status', validate(UpdateStatusSchema), asyncHandler(controller.updateStatus));
+
+  // No role gate, for the same reason as the status route: whether you may
+  // recategorise depends on your relationship to this request, not your role.
+  router.patch(
+    '/:id/category',
+    validate(ChangeCategorySchema),
+    asyncHandler(controller.changeCategory),
+  );
 
   router.get('/:id/history', validate(RequestIdSchema), asyncHandler(controller.getHistory));
 

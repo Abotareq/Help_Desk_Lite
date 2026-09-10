@@ -10,6 +10,7 @@ const HISTORY_EVENT_TYPES: HistoryEventType[] = [
   'ASSIGNED',
   'UNASSIGNED',
   'REOPENED',
+  'CATEGORY_CHANGED',
 ];
 
 interface CommentSubdocument {
@@ -25,6 +26,8 @@ interface HistorySubdocument {
   fromStatus: RequestStatus | null;
   toStatus: RequestStatus;
   actorId: Types.ObjectId;
+  fromCategory?: RequestCategory;
+  toCategory?: RequestCategory;
   note?: string;
   at: Date;
 }
@@ -54,6 +57,8 @@ const historySchema = new Schema<HistorySubdocument>(
     fromStatus: { type: String, enum: [...REQUEST_STATUSES, null], default: null },
     toStatus: { type: String, required: true, enum: REQUEST_STATUSES },
     actorId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    fromCategory: { type: String, enum: REQUEST_CATEGORIES },
+    toCategory: { type: String, enum: REQUEST_CATEGORIES },
     note: { type: String, trim: true, maxlength: 1000 },
     at: { type: Date, required: true, default: () => new Date() },
   },

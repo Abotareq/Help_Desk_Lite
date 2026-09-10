@@ -1,5 +1,6 @@
 import type { NewComment, RequestComment } from '../../domain/entities/Comment';
 import type { RequestHistoryEntry, SupportRequest } from '../../domain/entities/Request';
+import type { RequestCategory } from '../../domain/enums/RequestCategory';
 import { OPEN_STATUSES, REQUEST_STATUSES, RequestStatus } from '../../domain/enums/RequestStatus';
 import { UserRole, isHandlerRole } from '../../domain/enums/UserRole';
 import type {
@@ -360,6 +361,59 @@ export class RequestService {
     if (!saved) throw AppError.notFound('Request not found');
 
     return saved;
+  }
+
+  /**
+   * Recategorising is a handler's correction, not the requester's.
+   *
+   * Whoever raises a request picks from a fixed list and regularly picks wrong —
+   * a broken door reported as IT because that is where every request seems to
+   * start. The person who picks it up is the one who knows where it belongs, so
+   * permission here is the same relation the transition table calls a handler.
+   * The requester is deliberately excluded: letting them recategorise after a
+   * handler has corrected it would just restart the argument.
+   */
+  async changeCategory(
+    id: string,
+    category: RequestCategory,
+    actor: Actor,
+  ): Promise<SupportRequest> {
+    const request = await this.requireRequest(id);
+
+    if (!canView(request, actor)) throw AppError.notFound('Request not found');
+
+    if (isTerminal(request.status)) {
+      throw AppError.unprocessable('A closed request cannot be recategorised');
+    }
+
+    const relations = relationsOf(request, actor);
+    const isHandler =
+      relations.has(ActorRelation.ASSIGNEE) || relations.has(ActorRelation.MANAGER);
+    if (!isHandler) {
+      throw AppError.forbidden("Only the assignee or a manager can change a request's category");
+    }
+
+    // Idempotent rather than a 422. Setting a field to what it already holds is
+    // not a mistake worth refusing, and a no-op entry would be noise in the one
+    // place that has to stay readable.
+    if (request.category === category) return request;
+
+    const entry: RequestHistoryEntry = {
+      type: 'CATEGORY_CHANGED',
+      // The status did not move. Recording it either side keeps every entry the
+      // same shape, so the timeline never has to special-case a missing status.
+      fromStatus: request.status,
+      toStatus: request.status,
+      fromCategory: request.category,
+      toCategory: category,
+      actorId: actor.id,
+      at: new Date(),
+    };
+
+    const updated = await this.requests.update(request.id, { category }, entry);
+    if (!updated) throw AppError.notFound('Request not found');
+
+    return updated;
   }
 
   /** The audit trail for one request, oldest first. */

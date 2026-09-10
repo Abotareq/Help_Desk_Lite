@@ -1,4 +1,4 @@
-import { RequestStatus } from '../types/domain'
+import { RequestCategory, RequestStatus } from '../types/domain'
 
 /**
  * Status presentation lives here rather than beside the component, so the badge
@@ -16,6 +16,30 @@ export const STATUS_STYLES: Record<RequestStatus, { dot: string; label: string }
 export function statusLabel(status: RequestStatus): string {
   return STATUS_STYLES[status].label
 }
+
+/**
+ * Categories read as words rather than as the constants they are stored as.
+ * FACILITIES in a sentence — "moved it from IT to FACILITIES" — reads as
+ * shouting, and the raw value is a storage detail people should not have to see.
+ */
+export const CATEGORY_LABELS: Record<RequestCategory, string> = {
+  [RequestCategory.IT]: 'IT',
+  [RequestCategory.HR]: 'HR',
+  [RequestCategory.FACILITIES]: 'Facilities',
+  [RequestCategory.OTHER]: 'Other',
+}
+
+export function categoryLabel(category: RequestCategory): string {
+  return CATEGORY_LABELS[category]
+}
+
+/** The fixed list, in the order the form and the filters offer it. */
+export const CATEGORY_ORDER: RequestCategory[] = [
+  RequestCategory.IT,
+  RequestCategory.HR,
+  RequestCategory.FACILITIES,
+  RequestCategory.OTHER,
+]
 
 /** Display order for tabs and dashboard columns — the order work moves through. */
 export const STATUS_ORDER: RequestStatus[] = [

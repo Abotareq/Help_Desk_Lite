@@ -3,7 +3,13 @@ import type { RequestPriority } from '../enums/RequestPriority';
 import type { RequestStatus } from '../enums/RequestStatus';
 
 /** What kind of change produced a history entry. */
-export type HistoryEventType = 'CREATED' | 'STATUS_CHANGED' | 'ASSIGNED' | 'UNASSIGNED' | 'REOPENED';
+export type HistoryEventType =
+  | 'CREATED'
+  | 'STATUS_CHANGED'
+  | 'ASSIGNED'
+  | 'UNASSIGNED'
+  | 'REOPENED'
+  | 'CATEGORY_CHANGED';
 
 /**
  * One immutable line in a request's history. The PRD requires a basic record of
@@ -15,6 +21,13 @@ export interface RequestHistoryEntry {
   fromStatus: RequestStatus | null;
   toStatus: RequestStatus;
   actorId: string;
+  /**
+   * Set only on CATEGORY_CHANGED. Structured rather than folded into `note`
+   * because the timeline has to render this as a sentence, and a sentence
+   * assembled in the backend cannot be translated in the frontend.
+   */
+  fromCategory?: RequestCategory;
+  toCategory?: RequestCategory;
   note?: string;
   at: Date;
 }

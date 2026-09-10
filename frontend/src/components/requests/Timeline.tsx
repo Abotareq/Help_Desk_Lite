@@ -1,4 +1,4 @@
-import { statusLabel } from '../../lib/status'
+import { categoryLabel, statusLabel } from '../../lib/status'
 import { formatDateTime, timeAgo } from '../../lib/time'
 import type { HistoryEventType, RequestComment, RequestHistoryEntry } from '../../types/domain'
 import { Avatar } from '../ui/Avatar'
@@ -20,6 +20,7 @@ const DOT_COLOUR: Record<HistoryEventType, string> = {
   UNASSIGNED: 'bg-status-closed',
   STATUS_CHANGED: 'bg-ink-subtle',
   REOPENED: 'bg-status-waiting',
+  CATEGORY_CHANGED: 'bg-ink-subtle',
 }
 
 function describe(entry: RequestHistoryEntry, actorName: string): string {
@@ -32,6 +33,12 @@ function describe(entry: RequestHistoryEntry, actorName: string): string {
       return `${actorName} returned it to the queue`
     case 'REOPENED':
       return `${actorName} reopened it`
+    case 'CATEGORY_CHANGED':
+      // Both categories are structured fields on the entry rather than a
+      // pre-built sentence, so this reads as words and can be translated.
+      return entry.fromCategory && entry.toCategory
+        ? `${actorName} recategorised it from ${categoryLabel(entry.fromCategory)} to ${categoryLabel(entry.toCategory)}`
+        : `${actorName} recategorised it`
     case 'STATUS_CHANGED':
       return entry.fromStatus
         ? `${actorName} moved it from ${statusLabel(entry.fromStatus)} to ${statusLabel(entry.toStatus)}`

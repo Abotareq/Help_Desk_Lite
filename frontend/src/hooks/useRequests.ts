@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   addComment,
+  changeCategory,
   claimRequest,
   createRequest,
   fetchComments,
@@ -12,6 +13,7 @@ import {
   type RequestFilters,
   type StatusChange,
 } from '../api/requests'
+import type { RequestCategory } from '../types/domain'
 
 /**
  * Query keys in one place so a mutation can invalidate exactly what it changed,
@@ -65,6 +67,21 @@ export function useUpdateStatus(id: string) {
       // The move may have carried a message, and the response does not include
       // the thread — so it is refetched rather than guessed at.
       void queryClient.invalidateQueries({ queryKey: requestKeys.comments(id) })
+      void queryClient.invalidateQueries({ queryKey: requestKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: requestKeys.stats() })
+    },
+  })
+}
+
+export function useChangeCategory(id: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (category: RequestCategory) => changeCategory(id, category),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(requestKeys.detail(id), updated)
+      // The category is a column and a filter on every list, and one of the
+      // dashboard's cuts — none of them are current any more.
       void queryClient.invalidateQueries({ queryKey: requestKeys.lists() })
       void queryClient.invalidateQueries({ queryKey: requestKeys.stats() })
     },

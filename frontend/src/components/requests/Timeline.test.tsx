@@ -115,6 +115,40 @@ describe('interleaving', () => {
   })
 })
 
+describe('a recategorisation', () => {
+  it('names both categories as words', () => {
+    render(
+      <Timeline
+        names={names}
+        comments={[]}
+        history={[
+          event({
+            type: 'CATEGORY_CHANGED',
+            fromCategory: 'IT',
+            toCategory: 'FACILITIES',
+            actorId: 'u-agent',
+          }),
+        ]}
+      />,
+    )
+
+    expect(
+      screen.getByText('Sam Agent recategorised it from IT to Facilities'),
+    ).toBeInTheDocument()
+  })
+
+  // An older entry written before the categories were recorded, or one that
+  // somehow lost them, should still read as a sentence rather than as
+  // "undefined to undefined".
+  it('still reads as a sentence when the categories are missing', () => {
+    render(
+      <Timeline names={names} comments={[]} history={[event({ type: 'CATEGORY_CHANGED' })]} />,
+    )
+
+    expect(screen.getByText('Sam Agent recategorised it')).toBeInTheDocument()
+  })
+})
+
 /**
  * An internal note reaching this component has already been cleared by the API —
  * it filters the thread for whoever asked. What matters here is that whoever
