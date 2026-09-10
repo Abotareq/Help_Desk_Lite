@@ -8,6 +8,7 @@ import { Select } from '../../components/ui/Select'
 import { useCreateUser } from '../../hooks/useUsers'
 import { UserRole } from '../../types/domain'
 import { useI18n } from '../../hooks/useI18n'
+import { roleKey } from '../../i18n/keys'
 import type { MessageKey } from '../../i18n/en'
 
 /**
@@ -73,7 +74,7 @@ export function NewUserForm({ onDone }: { onDone: () => void }) {
           <Select id="new-role" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
             {Object.values(UserRole).map((value) => (
               <option key={value} value={value}>
-                {value}
+                {t(roleKey(value))}
               </option>
             ))}
           </Select>

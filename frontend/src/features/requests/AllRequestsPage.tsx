@@ -13,7 +13,7 @@ import { useRequestList } from '../../hooks/useRequests'
 import { useUsers } from '../../hooks/useUsers'
 import { STATUS_ORDER } from '../../lib/status'
 import { useI18n } from '../../hooks/useI18n'
-import { statusKey } from '../../i18n/keys'
+import { categoryKey, priorityKey, statusKey } from '../../i18n/keys'
 import {
   RequestCategory,
   RequestPriority,
@@ -119,7 +119,7 @@ export function AllRequestsPage() {
           <option value="">{t('filters.anyCategory')}</option>
           {Object.values(RequestCategory).map((c) => (
             <option key={c} value={c}>
-              {c}
+              {t(categoryKey(c))}
             </option>
           ))}
         </Select>
@@ -133,7 +133,7 @@ export function AllRequestsPage() {
           <option value="">{t('filters.anyPriority')}</option>
           {Object.values(RequestPriority).map((p) => (
             <option key={p} value={p}>
-              {p}
+              {t(priorityKey(p))}
             </option>
           ))}
         </Select>

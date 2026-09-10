@@ -15,6 +15,7 @@ import { UserRole, type OrphanedRequest, type User } from '../../types/domain'
 import { NewUserForm } from './NewUserForm'
 import { ResetPasswordDialog } from './ResetPasswordDialog'
 import { useI18n } from '../../hooks/useI18n'
+import { roleKey } from '../../i18n/keys'
 
 export function PeoplePage() {
   const { t } = useI18n()
@@ -178,7 +179,7 @@ export function PeoplePage() {
                     >
                       {Object.values(UserRole).map((role) => (
                         <option key={role} value={role}>
-                          {role}
+                          {t(roleKey(role))}
                         </option>
                       ))}
                     </Select>
