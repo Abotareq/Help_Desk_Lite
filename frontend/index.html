@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HelpDesk Lite</title>
+    <script>
+      // Runs before first paint. ThemeProvider sets this again on mount, but
+      // that is after React has rendered — leaving a white flash on every load
+      // for exactly the people who asked for dark.
+      try {
+        var stored = localStorage.getItem('helpdesk.theme')
+        var dark =
+          stored === 'dark' ||
+          ((!stored || stored === 'system') &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+      } catch (e) {
+        /* Blocked storage is not worth a blank page. */
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

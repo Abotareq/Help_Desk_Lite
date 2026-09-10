@@ -50,7 +50,7 @@ export function SignInPage() {
     <div className="flex h-full items-center justify-center bg-canvas p-6">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex size-9 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">
+          <div className="mx-auto mb-3 flex size-9 items-center justify-center rounded-lg bg-brand text-sm font-bold text-on-brand">
             H
           </div>
           <h1 className="text-base font-semibold text-ink">HelpDesk Lite</h1>

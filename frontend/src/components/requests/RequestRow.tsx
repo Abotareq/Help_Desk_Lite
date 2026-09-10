@@ -1,3 +1,4 @@
+import { categoryLabel } from '../../lib/status'
 import { Link } from 'react-router-dom'
 import { Badge } from '../ui/Badge'
 import { PriorityBadge } from '../ui/PriorityBadge'
@@ -39,7 +40,7 @@ export function RequestRow({ request, trailing }: RequestRowProps) {
         <PriorityBadge priority={request.priority} />
       </td>
       <td className="whitespace-nowrap py-2 pr-3 align-middle">
-        <Badge>{request.category}</Badge>
+        <Badge>{categoryLabel(request.category)}</Badge>
       </td>
       <td className="whitespace-nowrap py-2 pr-3 align-middle text-xs text-ink-subtle">
         {timeAgo(request.createdAt)}
