@@ -6,12 +6,15 @@ import { useUsers } from '../../hooks/useUsers'
 import { UserRole, type SupportRequest } from '../../types/domain'
 import { Alert } from '../ui/Alert'
 import { Select } from '../ui/Select'
+import { useI18n } from '../../hooks/useI18n'
 
 /**
  * Manager-only. Assign, reassign, or hand a request back to the queue — the
  * three things the API's assign endpoint does, in one control.
  */
 export function AssignControl({ request }: { request: SupportRequest }) {
+  const { t } = useI18n()
+
   const queryClient = useQueryClient()
   const { data: users } = useUsers()
 
@@ -31,12 +34,12 @@ export function AssignControl({ request }: { request: SupportRequest }) {
   return (
     <div className="space-y-2">
       <Select
-        aria-label="Assign to"
+        aria-label={t('assign.to')}
         value={request.assigneeId ?? ''}
         disabled={assign.isPending}
         onChange={(e) => assign.mutate(e.target.value || null)}
       >
-        <option value="">Unclaimed</option>
+        <option value="">{t('detail.unclaimed')}</option>
         {handlers.map((u) => (
           <option key={u.id} value={u.id}>
             {u.name}
@@ -46,7 +49,7 @@ export function AssignControl({ request }: { request: SupportRequest }) {
 
       {assign.isError ? (
         <Alert>
-          {assign.error instanceof ApiError ? assign.error.message : 'Could not reassign it.'}
+          {assign.error instanceof ApiError ? assign.error.message : t('assign.failed')}
         </Alert>
       ) : null}
     </div>

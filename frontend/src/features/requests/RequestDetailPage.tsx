@@ -24,7 +24,8 @@ import {
 } from '../../hooks/useRequests'
 import { useUserNames } from '../../hooks/useUserNames'
 import { formatDateTime } from '../../lib/time'
-import { categoryLabel } from '../../lib/status'
+import { useI18n } from '../../hooks/useI18n'
+import { categoryKey } from '../../i18n/keys'
 import { canChangeCategory, canClaim, canComment } from '../../lib/workflow'
 import { UserRole } from '../../types/domain'
 
@@ -32,12 +33,13 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-2 text-sm">
       <dt className="text-ink-muted">{label}</dt>
-      <dd className="text-right text-ink">{children}</dd>
+      <dd className="text-end text-ink">{children}</dd>
     </div>
   )
 }
 
 export function RequestDetailPage() {
+  const { t, locale } = useI18n()
   const { id = '' } = useParams()
   const viewer = useCurrentUser()
   const { data: request, isPending, error } = useRequest(id)
@@ -71,15 +73,13 @@ export function RequestDetailPage() {
     const notFound = error instanceof ApiError && error.status === 404
     return (
       <>
-        <PageHeader title="Request" />
+        <PageHeader title={t('detail.request')} />
         <div className="p-4">
           <Alert>
-            {notFound
-              ? 'That request does not exist, or you do not have access to it.'
-              : 'Could not load this request.'}
+            {notFound ? t('detail.notFound') : t('detail.loadFailed')}
           </Alert>
           <Link to="/" className="mt-3 inline-block">
-            <Button size="sm">Back to my requests</Button>
+            <Button size="sm">{t('detail.backToMine')}</Button>
           </Link>
         </div>
       </>
@@ -91,6 +91,7 @@ export function RequestDetailPage() {
   return (
     <>
       <PageHeader
+        contentDir="auto"
         title={request.reference}
         subtitle={request.title}
         actions={<StatusBadge status={request.status} />}
@@ -101,18 +102,18 @@ export function RequestDetailPage() {
           <div className="space-y-4 lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>{request.title}</CardTitle>
+                <CardTitle dir="auto">{request.title}</CardTitle>
               </CardHeader>
-              <p className="whitespace-pre-wrap px-4 py-3 text-sm text-ink">
+              <p dir="auto" className="whitespace-pre-wrap px-4 py-3 text-sm text-ink">
                 {request.description}
               </p>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Activity</CardTitle>
+                <CardTitle>{t('detail.activity')}</CardTitle>
                 <span className="text-xs text-ink-subtle">
-                  {request.history.length + thread.length} entries
+                  {t('detail.entries', { count: request.history.length + thread.length })}
                 </span>
               </CardHeader>
               <Timeline history={request.history} comments={thread} names={names} />
@@ -131,7 +132,7 @@ export function RequestDetailPage() {
           <div className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Actions</CardTitle>
+                <CardTitle>{t('detail.actions')}</CardTitle>
               </CardHeader>
               <div className="space-y-3 px-4 py-3">
                 {canClaim(request, viewer) ? (
@@ -141,7 +142,7 @@ export function RequestDetailPage() {
                     loading={claim.isPending}
                     onClick={() => claim.mutate(request.id)}
                   >
-                    Claim this request
+                    {t('detail.claim')}
                   </Button>
                 ) : null}
                 <StatusActions
@@ -156,50 +157,56 @@ export function RequestDetailPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Details</CardTitle>
+                <CardTitle>{t('detail.details')}</CardTitle>
               </CardHeader>
               <dl className="divide-y divide-line">
-                <Field label="Status">
+                <Field label={t('detail.status')}>
                   <StatusBadge status={request.status} />
                 </Field>
-                <Field label="Priority">
+                <Field label={t('detail.priority')}>
                   <PriorityBadge priority={request.priority} />
                 </Field>
                 {canChangeCategory(request, viewer) ? (
                   <div className="px-4 py-2">
-                    <p className="mb-1.5 text-sm text-ink-muted">Category</p>
+                    <p className="mb-1.5 text-sm text-ink-muted">{t('detail.category')}</p>
                     <CategoryControl request={request} />
                   </div>
                 ) : (
-                  <Field label="Category">
-                    <Badge>{categoryLabel(request.category)}</Badge>
+                  <Field label={t('detail.category')}>
+                    <Badge>{t(categoryKey(request.category))}</Badge>
                   </Field>
                 )}
                 {viewer.role === UserRole.MANAGER ? (
                   <div className="px-4 py-2">
-                    <p className="mb-1.5 text-sm text-ink-muted">Assigned to</p>
+                    <p className="mb-1.5 text-sm text-ink-muted">{t('detail.assignedTo')}</p>
                     <AssignControl request={request} />
                   </div>
                 ) : (
-                <Field label="Assigned to">
+                <Field label={t('detail.assignedTo')}>
                   {assigneeName ? (
                     <span className="inline-flex items-center gap-1.5">
                       <Avatar name={assigneeName} />
                       {assigneeName}
                     </span>
                   ) : request.assigneeId ? (
-                    <span className="text-ink-muted">Assigned</span>
+                    <span className="text-ink-muted">{t('detail.assigned')}</span>
                   ) : (
-                    <span className="text-ink-subtle">Unclaimed</span>
+                    <span className="text-ink-subtle">{t('detail.unclaimed')}</span>
                   )}
                 </Field>
                 )}
-                <Field label="Submitted">{formatDateTime(request.createdAt)}</Field>
+                <Field label={t('detail.submitted')}>
+                  {formatDateTime(request.createdAt, locale)}
+                </Field>
                 {request.resolvedAt ? (
-                  <Field label="Resolved">{formatDateTime(request.resolvedAt)}</Field>
+                  <Field label={t('detail.resolved')}>
+                    {formatDateTime(request.resolvedAt, locale)}
+                  </Field>
                 ) : null}
                 {request.closedAt ? (
-                  <Field label="Closed">{formatDateTime(request.closedAt)}</Field>
+                  <Field label={t('detail.closed')}>
+                    {formatDateTime(request.closedAt, locale)}
+                  </Field>
                 ) : null}
               </dl>
             </Card>

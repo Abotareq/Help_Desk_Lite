@@ -7,6 +7,7 @@ import { Input } from '../../components/ui/Input'
 import { Select } from '../../components/ui/Select'
 import { useCreateUser } from '../../hooks/useUsers'
 import { UserRole } from '../../types/domain'
+import { useI18n } from '../../hooks/useI18n'
 
 const ROLE_HINTS: Record<UserRole, string> = {
   [UserRole.EMPLOYEE]: 'Submits requests and tracks their own',
@@ -16,6 +17,8 @@ const ROLE_HINTS: Record<UserRole, string> = {
 
 /** v1 has no self sign-up, so this is the only way an account comes into being. */
 export function NewUserForm({ onDone }: { onDone: () => void }) {
+  const { t } = useI18n()
+
   const createUser = useCreateUser()
 
   const [email, setEmail] = useState('')
@@ -35,7 +38,7 @@ export function NewUserForm({ onDone }: { onDone: () => void }) {
       {error && error.details.length === 0 ? <Alert>{error.message}</Alert> : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <FormField label="Name" htmlFor="new-name" error={error?.fieldError('name')}>
+        <FormField label={t('people.name')} htmlFor="new-name" error={error?.fieldError('name')}>
           <Input
             id="new-name"
             value={name}
@@ -45,7 +48,7 @@ export function NewUserForm({ onDone }: { onDone: () => void }) {
           />
         </FormField>
 
-        <FormField label="Email" htmlFor="new-email" error={error?.fieldError('email')}>
+        <FormField label={t('people.email')} htmlFor="new-email" error={error?.fieldError('email')}>
           <Input
             id="new-email"
             type="email"
@@ -56,7 +59,7 @@ export function NewUserForm({ onDone }: { onDone: () => void }) {
         </FormField>
 
         <FormField
-          label="Role"
+          label={t('people.role')}
           htmlFor="new-role"
           error={error?.fieldError('role')}
           hint={ROLE_HINTS[role]}
@@ -71,7 +74,7 @@ export function NewUserForm({ onDone }: { onDone: () => void }) {
         </FormField>
 
         <FormField
-          label="Temporary password"
+          label={t('people.tempPassword')}
           htmlFor="new-password"
           error={error?.fieldError('password')}
           hint="At least 8 characters"

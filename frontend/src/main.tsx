@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './features/auth/AuthProvider'
 import { ThemeProvider } from './features/theme/ThemeProvider'
+import { I18nProvider } from './i18n/I18nProvider'
 import { AppRoutes } from './routes/AppRoutes'
 import './index.css'
 
@@ -30,13 +31,15 @@ if (!rootElement) throw new Error('Root element #root not found in index.html')
 createRoot(rootElement).render(
   <StrictMode>
     <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
+      <I18nProvider>
+        <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
             <AppRoutes />
           </AuthProvider>
         </BrowserRouter>
-      </QueryClientProvider>
+        </QueryClientProvider>
+      </I18nProvider>
     </ThemeProvider>
   </StrictMode>,
 )

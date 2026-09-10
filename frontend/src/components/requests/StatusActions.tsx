@@ -6,6 +6,7 @@ import { RequestStatus, type SupportRequest, type User } from '../../types/domai
 import { Alert } from '../ui/Alert'
 import { Button } from '../ui/Button'
 import { Textarea } from '../ui/Textarea'
+import { useI18n } from '../../hooks/useI18n'
 
 interface StatusActionsProps {
   request: SupportRequest
@@ -38,6 +39,8 @@ function asStatusChange(status: RequestStatus, text: string): StatusChange {
  * learns what they can do from the controls, not from a 422.
  */
 export function StatusActions({ request, viewer, pending, error, onMove }: StatusActionsProps) {
+  const { t } = useI18n()
+
   const actions = availableActions(request, viewer)
   const [pendingStatus, setPendingStatus] = useState<RequestStatus | null>(null)
   const [note, setNote] = useState('')
@@ -46,8 +49,8 @@ export function StatusActions({ request, viewer, pending, error, onMove }: Statu
     return (
       <p className="text-sm text-ink-subtle">
         {request.status === RequestStatus.CLOSED
-          ? 'This request is closed. Nothing moves out of it.'
-          : 'You have no actions on this request.'}
+          ? t('workflow.closedFinal')
+          : t('workflow.none')}
       </p>
     )
   }
@@ -79,22 +82,24 @@ export function StatusActions({ request, viewer, pending, error, onMove }: Statu
             onChange={(e) => setNote(e.target.value)}
             placeholder={
               pendingStatus === RequestStatus.WAITING
-                ? 'What do you need from the requester?'
-                : 'Add a note (optional)'
+                ? t('workflow.waitPlaceholder')
+                : t('workflow.notePlaceholder')
             }
           />
           <div className="flex gap-2">
             <Button variant="primary" size="sm" loading={pending} onClick={confirm}>
-              {actions.find((a) => a.to === pendingStatus)?.label ?? 'Confirm'}
+              {(() => {
+                const label = actions.find((a) => a.to === pendingStatus)?.label
+                return label ? t(label) : t('workflow.confirm')
+              })()}
             </Button>
             <Button size="sm" onClick={() => setPendingStatus(null)} disabled={pending}>
-              Cancel
+              {t('workflow.cancel')}
             </Button>
           </div>
           {pendingStatus === RequestStatus.WAITING ? (
             <p className="text-xs text-ink-subtle">
-              This goes to the requester as a comment they can answer. A request on hold without a
-              reason is the ambiguity this tool exists to remove.
+              {t('workflow.waitHint')}
             </p>
           ) : null}
         </div>
@@ -108,7 +113,7 @@ export function StatusActions({ request, viewer, pending, error, onMove }: Statu
               disabled={pending}
               onClick={() => start(action.to)}
             >
-              {action.label}
+              {t(action.label)}
             </Button>
           ))}
         </div>

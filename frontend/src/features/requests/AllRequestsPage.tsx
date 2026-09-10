@@ -11,7 +11,9 @@ import { Select } from '../../components/ui/Select'
 import { Spinner } from '../../components/ui/Spinner'
 import { useRequestList } from '../../hooks/useRequests'
 import { useUsers } from '../../hooks/useUsers'
-import { STATUS_ORDER, statusLabel } from '../../lib/status'
+import { STATUS_ORDER } from '../../lib/status'
+import { useI18n } from '../../hooks/useI18n'
+import { statusKey } from '../../i18n/keys'
 import {
   RequestCategory,
   RequestPriority,
@@ -28,6 +30,8 @@ const PAGE_SIZE = 25
  * thing you send someone, not a thing you describe over chat.
  */
 export function AllRequestsPage() {
+  const { t } = useI18n()
+
   const [params, setParams] = useSearchParams()
   const { data: users } = useUsers()
 
@@ -65,8 +69,8 @@ export function AllRequestsPage() {
   return (
     <>
       <PageHeader
-        title="All requests"
-        subtitle={data ? `${data.total} matching` : undefined}
+        title={t('allRequests.title')}
+        subtitle={data ? t('allRequests.matching', { count: data.total }) : undefined}
         actions={
           activeFilters.length > 0 ? (
             <Button size="sm" onClick={() => setParams(new URLSearchParams(), { replace: true })}>
@@ -78,27 +82,27 @@ export function AllRequestsPage() {
 
       <div className="flex flex-wrap items-center gap-2 border-b border-line bg-canvas px-4 py-2">
         <Select
-          aria-label="Filter by status"
+          aria-label={t('filters.status')}
           className="h-7 w-auto min-w-32"
           value={status ?? ''}
           onChange={(e) => setFilter('status', e.target.value)}
         >
-          <option value="">Any status</option>
+          <option value="">{t('filters.anyStatus')}</option>
           {STATUS_ORDER.map((s) => (
             <option key={s} value={s}>
-              {statusLabel(s)}
+              {t(statusKey(s))}
             </option>
           ))}
         </Select>
 
         <Select
-          aria-label="Filter by owner"
+          aria-label={t('filters.owner')}
           className="h-7 w-auto min-w-32"
           value={assignee ?? ''}
           onChange={(e) => setFilter('assignee', e.target.value)}
         >
-          <option value="">Any owner</option>
-          <option value="unassigned">Unclaimed</option>
+          <option value="">{t('filters.anyOwner')}</option>
+          <option value="unassigned">{t('detail.unclaimed')}</option>
           {handlers.map((u) => (
             <option key={u.id} value={u.id}>
               {u.name}
@@ -107,12 +111,12 @@ export function AllRequestsPage() {
         </Select>
 
         <Select
-          aria-label="Filter by category"
+          aria-label={t('filters.category')}
           className="h-7 w-auto min-w-32"
           value={category ?? ''}
           onChange={(e) => setFilter('category', e.target.value)}
         >
-          <option value="">Any category</option>
+          <option value="">{t('filters.anyCategory')}</option>
           {Object.values(RequestCategory).map((c) => (
             <option key={c} value={c}>
               {c}
@@ -121,12 +125,12 @@ export function AllRequestsPage() {
         </Select>
 
         <Select
-          aria-label="Filter by priority"
+          aria-label={t('filters.priority')}
           className="h-7 w-auto min-w-32"
           value={priority ?? ''}
           onChange={(e) => setFilter('priority', e.target.value)}
         >
-          <option value="">Any priority</option>
+          <option value="">{t('filters.anyPriority')}</option>
           {Object.values(RequestPriority).map((p) => (
             <option key={p} value={p}>
               {p}
@@ -148,7 +152,7 @@ export function AllRequestsPage() {
           </div>
         ) : data.items.length === 0 ? (
           <EmptyState
-            title="Nothing matches those filters"
+            title={t('filters.noMatch')}
             description={
               activeFilters.length > 0
                 ? 'Try widening one of them.'
@@ -159,7 +163,7 @@ export function AllRequestsPage() {
           <>
             <RequestTable
               trailingHeaders={
-                <th scope="col" className="w-36 py-2 pr-4 font-medium">
+                <th scope="col" className="w-36 py-2 pe-4 font-medium">
                   Owner
                 </th>
               }
@@ -204,17 +208,18 @@ export function AllRequestsPage() {
 }
 
 function OwnerCell({ request, names }: { request: SupportRequest; names: Map<string, string> }) {
+  const { t } = useI18n()
   const name = request.assigneeId ? names.get(request.assigneeId) : null
 
   return (
-    <td className="whitespace-nowrap py-2 pr-4 align-middle">
+    <td className="whitespace-nowrap py-2 pe-4 align-middle">
       {name ? (
         <span className="inline-flex items-center gap-1.5 text-sm text-ink-muted">
           <Avatar name={name} />
           <span className="max-w-24 truncate">{name}</span>
         </span>
       ) : (
-        <span className="text-sm text-status-waiting">Unclaimed</span>
+        <span className="text-sm text-status-waiting">{t('detail.unclaimed')}</span>
       )}
     </td>
   )

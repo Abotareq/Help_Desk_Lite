@@ -15,6 +15,15 @@ export function CardHeader({ children, className }: { children: ReactNode; class
   )
 }
 
-export function CardTitle({ children }: { children: ReactNode }) {
-  return <h2 className="text-sm font-semibold text-ink">{children}</h2>
+/**
+ * `dir` is forwarded rather than fixed, because a card title is sometimes ours
+ * and sometimes the user's. Their text has to declare its own direction or it
+ * inherits the page's and reads with its punctuation on the wrong end.
+ */
+export function CardTitle({ children, dir }: { children: ReactNode; dir?: 'auto' | 'ltr' | 'rtl' }) {
+  return (
+    <h2 dir={dir} className="text-sm font-semibold text-ink">
+      {children}
+    </h2>
+  )
 }

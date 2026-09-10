@@ -5,6 +5,7 @@ import type { SupportRequest, User } from '../../types/domain'
 import { Alert } from '../ui/Alert'
 import { Button } from '../ui/Button'
 import { Textarea } from '../ui/Textarea'
+import { useI18n } from '../../hooks/useI18n'
 
 interface CommentFormProps {
   request: SupportRequest
@@ -20,6 +21,8 @@ interface CommentFormProps {
  * buttons: never offer a control that would come back a 403.
  */
 export function CommentForm({ request, viewer, pending, error, onPost }: CommentFormProps) {
+  const { t } = useI18n()
+
   const [body, setBody] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const mayWriteInternal = canWriteInternalNote(request, viewer)
@@ -42,11 +45,11 @@ export function CommentForm({ request, viewer, pending, error, onPost }: Comment
       <Textarea
         rows={3}
         value={body}
-        aria-label="Add a comment"
+        aria-label={t('comment.add')}
         placeholder={
           isInternal
-            ? 'A note for whoever handles this. The requester will not see it.'
-            : 'Reply to this request…'
+            ? t('comment.internalPlaceholder')
+            : t('comment.placeholder')
         }
         onChange={(e) => setBody(e.target.value)}
       />
@@ -67,7 +70,7 @@ export function CommentForm({ request, viewer, pending, error, onPost }: Comment
         )}
 
         <Button type="submit" variant="primary" size="sm" loading={pending} disabled={!trimmed}>
-          {isInternal ? 'Add internal note' : 'Comment'}
+          {isInternal ? t('comment.submitInternal') : t('comment.submit')}
         </Button>
       </div>
     </form>

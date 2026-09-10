@@ -16,6 +16,13 @@
           ((!stored || stored === 'system') &&
             window.matchMedia('(prefers-color-scheme: dark)').matches)
         document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+
+        var lang = localStorage.getItem('helpdesk.language')
+        if (lang !== 'ar' && lang !== 'en') {
+          lang = (navigator.language || 'en').indexOf('ar') === 0 ? 'ar' : 'en'
+        }
+        document.documentElement.lang = lang
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
       } catch (e) {
         /* Blocked storage is not worth a blank page. */
       }

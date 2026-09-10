@@ -1,5 +1,6 @@
-import { categoryLabel } from '../../lib/status'
 import { Link } from 'react-router-dom'
+import { useI18n } from '../../hooks/useI18n'
+import { categoryKey } from '../../i18n/keys'
 import { Badge } from '../ui/Badge'
 import { PriorityBadge } from '../ui/PriorityBadge'
 import { StatusBadge } from '../ui/StatusBadge'
@@ -18,9 +19,11 @@ interface RequestRowProps {
  * link, and colour appears only on the status dot and the priority.
  */
 export function RequestRow({ request, trailing }: RequestRowProps) {
+  const { t, locale } = useI18n()
+
   return (
     <tr className="group border-b border-line last:border-0 hover:bg-canvas">
-      <td className="whitespace-nowrap py-2 pl-4 pr-3 align-middle">
+      <td className="whitespace-nowrap py-2 ps-4 pe-3 align-middle">
         <Link
           to={`/requests/${request.id}`}
           className="font-mono text-xs text-ink-muted group-hover:text-brand"
@@ -28,22 +31,22 @@ export function RequestRow({ request, trailing }: RequestRowProps) {
           {request.reference}
         </Link>
       </td>
-      <td className="max-w-0 py-2 pr-3 align-middle">
-        <Link to={`/requests/${request.id}`} className="block truncate text-sm text-ink">
+      <td className="max-w-0 py-2 pe-3 align-middle">
+        <Link dir="auto" to={`/requests/${request.id}`} className="block truncate text-sm text-ink">
           {request.title}
         </Link>
       </td>
-      <td className="whitespace-nowrap py-2 pr-3 align-middle">
+      <td className="whitespace-nowrap py-2 pe-3 align-middle">
         <StatusBadge status={request.status} />
       </td>
-      <td className="whitespace-nowrap py-2 pr-3 align-middle">
+      <td className="whitespace-nowrap py-2 pe-3 align-middle">
         <PriorityBadge priority={request.priority} />
       </td>
-      <td className="whitespace-nowrap py-2 pr-3 align-middle">
-        <Badge>{categoryLabel(request.category)}</Badge>
+      <td className="whitespace-nowrap py-2 pe-3 align-middle">
+        <Badge>{t(categoryKey(request.category))}</Badge>
       </td>
-      <td className="whitespace-nowrap py-2 pr-3 align-middle text-xs text-ink-subtle">
-        {timeAgo(request.createdAt)}
+      <td className="whitespace-nowrap py-2 pe-3 align-middle text-xs text-ink-subtle">
+        {timeAgo(request.createdAt, locale)}
       </td>
       {trailing}
     </tr>

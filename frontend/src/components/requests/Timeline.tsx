@@ -1,4 +1,6 @@
-import { categoryLabel, statusLabel } from '../../lib/status'
+import { useI18n } from '../../hooks/useI18n'
+import { categoryKey, statusKey } from '../../i18n/keys'
+import type { I18nContextValue } from '../../i18n/i18nContext'
 import { formatDateTime, timeAgo } from '../../lib/time'
 import type { HistoryEventType, RequestComment, RequestHistoryEntry } from '../../types/domain'
 import { Avatar } from '../ui/Avatar'
@@ -23,28 +25,40 @@ const DOT_COLOUR: Record<HistoryEventType, string> = {
   CATEGORY_CHANGED: 'bg-ink-subtle',
 }
 
-function describe(entry: RequestHistoryEntry, actorName: string): string {
+/**
+ * The whole sentence comes from the catalogue with the actor and the states
+ * interpolated, rather than being assembled from fragments here. Word order is
+ * not the same in every language, so a sentence stitched together in code can
+ * only ever be right in the one it was written for.
+ */
+function describe(entry: RequestHistoryEntry, actor: string, t: I18nContextValue['t']): string {
   switch (entry.type) {
     case 'CREATED':
-      return `${actorName} submitted this request`
+      return t('timeline.created', { actor })
     case 'ASSIGNED':
-      return `${actorName} assigned it`
+      return t('timeline.assigned', { actor })
     case 'UNASSIGNED':
-      return `${actorName} returned it to the queue`
+      return t('timeline.unassigned', { actor })
     case 'REOPENED':
-      return `${actorName} reopened it`
+      return t('timeline.reopened', { actor })
     case 'CATEGORY_CHANGED':
-      // Both categories are structured fields on the entry rather than a
-      // pre-built sentence, so this reads as words and can be translated.
       return entry.fromCategory && entry.toCategory
-        ? `${actorName} recategorised it from ${categoryLabel(entry.fromCategory)} to ${categoryLabel(entry.toCategory)}`
-        : `${actorName} recategorised it`
+        ? t('timeline.categoryChanged', {
+            actor,
+            from: t(categoryKey(entry.fromCategory)),
+            to: t(categoryKey(entry.toCategory)),
+          })
+        : t('timeline.categoryChangedPlain', { actor })
     case 'STATUS_CHANGED':
       return entry.fromStatus
-        ? `${actorName} moved it from ${statusLabel(entry.fromStatus)} to ${statusLabel(entry.toStatus)}`
-        : `${actorName} set it to ${statusLabel(entry.toStatus)}`
+        ? t('timeline.statusChanged', {
+            actor,
+            from: t(statusKey(entry.fromStatus)),
+            to: t(statusKey(entry.toStatus)),
+          })
+        : t('timeline.statusSet', { actor, to: t(statusKey(entry.toStatus)) })
     default:
-      return `${actorName} updated it`
+      return t('timeline.updated', { actor })
   }
 }
 
@@ -88,10 +102,11 @@ interface TimelineProps {
 }
 
 export function Timeline({ history, comments, names }: TimelineProps) {
+  const { t, locale } = useI18n()
   const items = merge(history, comments)
 
   if (items.length === 0) {
-    return <p className="px-4 py-6 text-sm text-ink-subtle">Nothing has happened yet.</p>
+    return <p className="px-4 py-6 text-sm text-ink-subtle">{t('timeline.empty')}</p>
   }
 
   return (
@@ -99,13 +114,13 @@ export function Timeline({ history, comments, names }: TimelineProps) {
       {items.map((item, index) => {
         const isLast = index === items.length - 1
         const authorId = item.kind === 'event' ? item.entry.actorId : item.comment.authorId
-        const name = names.get(authorId) ?? 'Someone'
+        const name = names.get(authorId) ?? t('timeline.someone')
         const at = item.kind === 'event' ? item.entry.at : item.comment.at
 
         return (
           <li key={item.key} className="relative flex gap-3 pb-4 last:pb-0">
             {!isLast ? (
-              <span className="absolute left-[9px] top-5 h-full w-px bg-line" aria-hidden="true" />
+              <span className="absolute start-[9px] top-5 h-full w-px bg-line" aria-hidden="true" />
             ) : null}
 
             <span className="relative z-10 mt-1.5 flex size-[19px] shrink-0 items-center justify-center">
@@ -125,26 +140,36 @@ export function Timeline({ history, comments, names }: TimelineProps) {
               <div className="flex flex-wrap items-baseline gap-x-2">
                 <Avatar name={name} />
                 <span className="text-sm text-ink">
-                  {item.kind === 'event' ? describe(item.entry, name) : `${name} commented`}
+                  {item.kind === 'event'
+                    ? describe(item.entry, name, t)
+                    : t('timeline.commented', { actor: name })}
                 </span>
                 {item.kind === 'comment' && item.comment.isInternal ? (
                   <Badge className="border-priority-medium/40 text-priority-medium">
-                    Internal note
+                    {t('timeline.internalNote')}
                   </Badge>
                 ) : null}
-                <time dateTime={at} title={formatDateTime(at)} className="text-xs text-ink-subtle">
-                  {timeAgo(at)}
+                <time
+                  dateTime={at}
+                  title={formatDateTime(at, locale)}
+                  className="text-xs text-ink-subtle"
+                >
+                  {timeAgo(at, locale)}
                 </time>
               </div>
 
               {item.kind === 'event' && item.entry.note ? (
-                <p className="mt-1 rounded-md border border-line bg-canvas px-2.5 py-1.5 text-sm text-ink-muted">
+                <p
+                  dir="auto"
+                  className="mt-1 rounded-md border border-line bg-canvas px-2.5 py-1.5 text-sm text-ink-muted"
+                >
                   {item.entry.note}
                 </p>
               ) : null}
 
               {item.kind === 'comment' ? (
                 <p
+                  dir="auto"
                   className={`mt-1 whitespace-pre-wrap rounded-md border px-2.5 py-1.5 text-sm ${
                     item.comment.isInternal
                       ? 'border-dashed border-priority-medium/40 bg-priority-medium/5 text-ink'

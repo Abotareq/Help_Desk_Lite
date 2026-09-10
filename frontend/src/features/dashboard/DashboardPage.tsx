@@ -12,6 +12,7 @@ import { useUsers } from '../../hooks/useUsers'
 import { STATUS_ORDER } from '../../lib/status'
 import { cn } from '../../lib/cn'
 import type { RequestStatus } from '../../types/domain'
+import { useI18n } from '../../hooks/useI18n'
 
 interface StatTileProps {
   label: string
@@ -47,6 +48,8 @@ function StatTile({ label, value, hint, to, emphasis }: StatTileProps) {
 }
 
 export function DashboardPage() {
+  const { t } = useI18n()
+
   const viewer = useCurrentUser()
   const { data: stats, isPending, error } = useStats()
   const { data: users } = useUsers()
@@ -56,7 +59,7 @@ export function DashboardPage() {
   if (isPending) {
     return (
       <>
-        <PageHeader title="Dashboard" />
+        <PageHeader title={t('dashboard.title')} />
         <div className="flex flex-1 items-center justify-center text-ink-subtle">
           <Spinner size={20} />
         </div>
@@ -67,7 +70,7 @@ export function DashboardPage() {
   if (error) {
     return (
       <>
-        <PageHeader title="Dashboard" />
+        <PageHeader title={t('dashboard.title')} />
         <div className="p-4">
           <Alert>
             {error instanceof ApiError ? error.message : 'Could not load the dashboard.'}
@@ -81,25 +84,25 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHeader title="Dashboard" subtitle="Where the work is right now" />
+      <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} />
 
       <div className="flex-1 overflow-auto bg-canvas p-4">
         <div className="mx-auto max-w-5xl space-y-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <StatTile label="Open" value={stats.open} hint="Still needs someone" to="/all" />
+            <StatTile label={t('dashboard.open')} value={stats.open} hint="Still needs someone" to="/all" />
             <StatTile
-              label="Unclaimed"
+              label={t('dashboard.unclaimed')}
               value={stats.unassigned}
               hint="Nobody has picked these up"
               to="/all?assignee=unassigned"
               emphasis
             />
-            <StatTile label="Total" value={stats.total} hint="Everything ever raised" to="/all" />
+            <StatTile label={t('dashboard.total')} value={stats.total} hint="Everything ever raised" to="/all" />
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>By status</CardTitle>
+              <CardTitle>{t('dashboard.byStatus')}</CardTitle>
             </CardHeader>
             <ul className="divide-y divide-line">
               {/*
@@ -120,11 +123,11 @@ export function DashboardPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Workload by owner</CardTitle>
-              <span className="text-xs text-ink-subtle">Who is carrying what</span>
+              <CardTitle>{t('dashboard.workload')}</CardTitle>
+              <span className="text-xs text-ink-subtle">{t('dashboard.whoCarries')}</span>
             </CardHeader>
             {busiest.length === 0 ? (
-              <p className="px-4 py-6 text-sm text-ink-subtle">Nothing has been raised yet.</p>
+              <p className="px-4 py-6 text-sm text-ink-subtle">{t('dashboard.empty')}</p>
             ) : (
               <ul className="divide-y divide-line">
                 {busiest.map((row) => {

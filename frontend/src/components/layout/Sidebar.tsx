@@ -1,13 +1,18 @@
 import { NavLink } from 'react-router-dom'
+import { useI18n } from '../../hooks/useI18n'
+import { roleKey } from '../../i18n/keys'
+import { LanguageToggle } from './LanguageToggle'
 import { ThemeToggle } from './ThemeToggle'
 import { Avatar } from '../ui/Avatar'
 import { Button } from '../ui/Button'
 import { cn } from '../../lib/cn'
 import { UserRole, type User } from '../../types/domain'
+import type { MessageKey } from '../../i18n/en'
 
 interface NavItem {
   to: string
-  label: string
+  /** Message key, not text — the label is resolved at render, in the reader's language. */
+  label: MessageKey
   /** Which roles see this item at all. */
   roles: UserRole[]
   end?: boolean
@@ -19,11 +24,16 @@ interface NavItem {
  * that way.
  */
 const NAV: NavItem[] = [
-  { to: '/', label: 'My requests', roles: [UserRole.EMPLOYEE, UserRole.AGENT, UserRole.MANAGER], end: true },
-  { to: '/queue', label: 'Queue', roles: [UserRole.AGENT] },
-  { to: '/all', label: 'All requests', roles: [UserRole.MANAGER] },
-  { to: '/dashboard', label: 'Dashboard', roles: [UserRole.MANAGER] },
-  { to: '/people', label: 'People', roles: [UserRole.MANAGER] },
+  {
+    to: '/',
+    label: 'nav.myRequests',
+    roles: [UserRole.EMPLOYEE, UserRole.AGENT, UserRole.MANAGER],
+    end: true,
+  },
+  { to: '/queue', label: 'nav.queue', roles: [UserRole.AGENT] },
+  { to: '/all', label: 'nav.allRequests', roles: [UserRole.MANAGER] },
+  { to: '/dashboard', label: 'nav.dashboard', roles: [UserRole.MANAGER] },
+  { to: '/people', label: 'nav.people', roles: [UserRole.MANAGER] },
 ]
 
 interface SidebarProps {
@@ -46,6 +56,7 @@ interface SidebarProps {
  * and takes its own column.
  */
 export function Sidebar({ user, onSignOut, open, onClose }: SidebarProps) {
+  const { t } = useI18n()
   const items = NAV.filter((item) => item.roles.includes(user.role))
 
   if (!open) return null
@@ -55,29 +66,36 @@ export function Sidebar({ user, onSignOut, open, onClose }: SidebarProps) {
       {/* Tapping outside closes it — only present while it overlays content. */}
       <button
         type="button"
-        aria-label="Close navigation"
+        aria-label={t('nav.close')}
         onClick={onClose}
         className="fixed inset-0 z-20 bg-scrim/40 md:hidden"
       />
 
       <aside
         className={cn(
-          'z-30 flex w-56 shrink-0 flex-col border-r border-line bg-canvas',
-          'fixed inset-y-0 left-0 md:static md:inset-auto',
+          'z-30 flex w-56 shrink-0 flex-col border-e border-line bg-canvas',
+          'fixed inset-y-0 start-0 md:static md:inset-auto',
         )}
       >
         <div className="flex h-12 items-center gap-2 px-3">
           <div className="flex size-6 shrink-0 items-center justify-center rounded bg-brand text-xs font-bold text-on-brand">
             H
           </div>
-          <span className="truncate text-sm font-semibold text-ink">HelpDesk Lite</span>
+          <span className="truncate text-sm font-semibold text-ink">{t('app.name')}</span>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close navigation"
-            className="ml-auto rounded p-1 text-ink-subtle hover:bg-line hover:text-ink"
+            aria-label={t('nav.close')}
+            className="ms-auto rounded p-1 text-ink-subtle hover:bg-line hover:text-ink"
           >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+              className="rtl:-scale-x-100"
+            >
               <path
                 d="M10 3L5 8l5 5"
                 stroke="currentColor"
@@ -109,13 +127,14 @@ export function Sidebar({ user, onSignOut, open, onClose }: SidebarProps) {
                 )
               }
             >
-              {item.label}
+              {t(item.label)}
             </NavLink>
           ))}
         </nav>
 
         <div className="border-t border-line p-2">
-          <div className="px-1 pb-2">
+          <div className="space-y-1.5 px-1 pb-2">
+            <LanguageToggle />
             <ThemeToggle />
           </div>
 
@@ -123,11 +142,11 @@ export function Sidebar({ user, onSignOut, open, onClose }: SidebarProps) {
             <Avatar name={user.name} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium text-ink">{user.name}</p>
-              <p className="truncate text-[11px] text-ink-subtle">{user.role.toLowerCase()}</p>
+              <p className="truncate text-[11px] text-ink-subtle">{t(roleKey(user.role))}</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={onSignOut} className="mt-1 w-full justify-start">
-            Sign out
+            {t('nav.signOut')}
           </Button>
         </div>
       </aside>

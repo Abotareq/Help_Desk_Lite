@@ -1,10 +1,12 @@
 import { RequestPriority } from '../../types/domain'
+import { useI18n } from '../../hooks/useI18n'
+import { priorityKey } from '../../i18n/keys'
 import { cn } from '../../lib/cn'
 
-const PRIORITY_STYLES: Record<RequestPriority, { className: string; label: string }> = {
-  [RequestPriority.HIGH]: { className: 'text-priority-high', label: 'High' },
-  [RequestPriority.MEDIUM]: { className: 'text-priority-medium', label: 'Medium' },
-  [RequestPriority.LOW]: { className: 'text-priority-low', label: 'Low' },
+const PRIORITY_STYLES: Record<RequestPriority, string> = {
+  [RequestPriority.HIGH]: 'text-priority-high',
+  [RequestPriority.MEDIUM]: 'text-priority-medium',
+  [RequestPriority.LOW]: 'text-priority-low',
 }
 
 export function PriorityBadge({
@@ -14,6 +16,10 @@ export function PriorityBadge({
   priority: RequestPriority
   className?: string
 }) {
-  const style = PRIORITY_STYLES[priority]
-  return <span className={cn('text-sm', style.className, className)}>{style.label}</span>
+  const { t } = useI18n()
+  return (
+    <span className={cn('text-sm', PRIORITY_STYLES[priority], className)}>
+      {t(priorityKey(priority))}
+    </span>
+  )
 }

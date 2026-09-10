@@ -1,0 +1,199 @@
+import type { Catalogue } from './en'
+
+/**
+ * Typed as Catalogue, so a missing key or a key that no longer exists is a
+ * compile error rather than a word that renders as `detail.assignedTo` in front
+ * of someone.
+ *
+ * Counts carry all six forms Arabic uses. Intl.PluralRules picks between them;
+ * writing only `one` and `other` — the English shape — would be wrong for
+ * roughly half the numbers a queue actually shows.
+ */
+export const ar: Catalogue = {
+  'app.name': 'مكتب المساعدة',
+
+  'nav.myRequests': 'طلباتي',
+  'nav.queue': 'قائمة العمل',
+  'nav.allRequests': 'كل الطلبات',
+  'nav.dashboard': 'لوحة المتابعة',
+  'nav.people': 'الأشخاص',
+  'nav.open': 'فتح القائمة',
+  'nav.close': 'إغلاق القائمة',
+  'nav.signOut': 'تسجيل الخروج',
+
+  'theme.label': 'سمة الألوان',
+  'theme.light': 'فاتح',
+  'theme.dark': 'داكن',
+  'theme.system': 'تلقائي',
+
+  'language.label': 'اللغة',
+  'language.en': 'English',
+  'language.ar': 'العربية',
+
+  'signIn.title': 'سجّل الدخول لتقديم الطلبات ومتابعتها',
+  'signIn.email': 'البريد الإلكتروني',
+  'signIn.emailPlaceholder': 'you@company.com',
+  'signIn.password': 'كلمة المرور',
+  'signIn.submit': 'تسجيل الدخول',
+  'signIn.noSelfSignUp': 'يُنشئ المدير الحسابات — لا يوجد تسجيل ذاتي.',
+
+  'status.NEW': 'جديد',
+  'status.IN_PROGRESS': 'قيد التنفيذ',
+  'status.WAITING': 'بانتظار الرد',
+  'status.RESOLVED': 'تم الحل',
+  'status.CLOSED': 'مغلق',
+
+  'priority.LOW': 'منخفضة',
+  'priority.MEDIUM': 'متوسطة',
+  'priority.HIGH': 'عالية',
+
+  'category.IT': 'تقنية المعلومات',
+  'category.HR': 'الموارد البشرية',
+  'category.FACILITIES': 'المرافق',
+  'category.OTHER': 'أخرى',
+
+  'role.EMPLOYEE': 'موظف',
+  'role.AGENT': 'أخصائي دعم',
+  'role.MANAGER': 'مدير',
+
+  'requests.newRequest': 'طلب جديد',
+  'requests.total': {
+    zero: 'لا توجد طلبات',
+    one: 'طلب واحد',
+    two: 'طلبان',
+    few: '{count} طلبات',
+    many: '{count} طلبًا',
+    other: '{count} طلب',
+  },
+  'requests.colRef': 'الرقم',
+  'requests.colSubject': 'الموضوع',
+  'requests.colStatus': 'الحالة',
+  'requests.colPriority': 'الأولوية',
+  'requests.colCategory': 'التصنيف',
+  'requests.colAge': 'المدة',
+  'requests.colRequester': 'مقدّم الطلب',
+  'requests.colAssignee': 'المسؤول',
+
+  'detail.activity': 'النشاط',
+  'detail.entries': {
+    zero: 'لا توجد أحداث',
+    one: 'حدث واحد',
+    two: 'حدثان',
+    few: '{count} أحداث',
+    many: '{count} حدثًا',
+    other: '{count} حدث',
+  },
+  'detail.actions': 'الإجراءات',
+  'detail.details': 'التفاصيل',
+  'detail.status': 'الحالة',
+  'detail.priority': 'الأولوية',
+  'detail.category': 'التصنيف',
+  'detail.assignedTo': 'المسؤول',
+  'detail.submitted': 'تاريخ التقديم',
+  'detail.resolved': 'تاريخ الحل',
+  'detail.closed': 'تاريخ الإغلاق',
+  'detail.unclaimed': 'غير مُسند',
+  'detail.assigned': 'مُسند',
+  'detail.claim': 'استلام هذا الطلب',
+  'detail.backToMine': 'العودة إلى طلباتي',
+  'detail.request': 'طلب',
+  'detail.notFound': 'هذا الطلب غير موجود، أو ليس لديك صلاحية للاطلاع عليه.',
+  'detail.loadFailed': 'تعذّر تحميل هذا الطلب.',
+
+  'timeline.empty': 'لم يحدث شيء بعد.',
+  'timeline.created': 'قدّم {actor} هذا الطلب',
+  'timeline.assigned': 'أسنده {actor}',
+  'timeline.unassigned': 'أعاده {actor} إلى قائمة العمل',
+  'timeline.reopened': 'أعاد {actor} فتحه',
+  'timeline.statusChanged': 'نقله {actor} من {from} إلى {to}',
+  'timeline.statusSet': 'ضبطه {actor} على {to}',
+  'timeline.categoryChanged': 'غيّر {actor} تصنيفه من {from} إلى {to}',
+  'timeline.categoryChangedPlain': 'غيّر {actor} تصنيفه',
+  'timeline.updated': 'حدّثه {actor}',
+  'timeline.commented': 'علّق {actor}',
+  'timeline.internalNote': 'ملاحظة داخلية',
+  'timeline.someone': 'أحدهم',
+
+  'comment.add': 'إضافة تعليق',
+  'comment.placeholder': 'اكتب ردًا على هذا الطلب…',
+  'comment.internalPlaceholder': 'ملاحظة لمن يتولى هذا الطلب. لن يراها مقدّم الطلب.',
+  'comment.submit': 'تعليق',
+  'comment.submitInternal': 'إضافة ملاحظة داخلية',
+  'comment.failed': 'تعذّر نشر التعليق.',
+
+  'workflow.startWork': 'بدء العمل',
+  'workflow.withdraw': 'سحب الطلب',
+  'workflow.wait': 'انتظار رد مقدّم الطلب',
+  'workflow.resolve': 'وضع علامة تم الحل',
+  'workflow.resume': 'استئناف',
+  'workflow.reopen': 'إعادة الفتح',
+  'workflow.close': 'إغلاق',
+  'workflow.confirm': 'تأكيد',
+  'workflow.cancel': 'إلغاء',
+  'workflow.none': 'ليس لديك إجراءات على هذا الطلب.',
+  'workflow.closedFinal': 'هذا الطلب مغلق، ولا يمكن نقله إلى حالة أخرى.',
+  'workflow.notePlaceholder': 'أضف ملاحظة (اختياري)',
+  'workflow.waitPlaceholder': 'ما الذي تحتاجه من مقدّم الطلب؟',
+  'workflow.waitHint':
+    'يصل هذا إلى مقدّم الطلب كتعليق يمكنه الرد عليه. طلب معلّق دون سبب هو الغموض الذي وُجدت هذه الأداة لإزالته.',
+
+  'category.changeFailed': 'تعذّر تغيير التصنيف.',
+  'assign.failed': 'تعذّرت إعادة الإسناد.',
+
+
+  'assign.to': 'إسناد إلى',
+
+  'filters.status': 'تصفية حسب الحالة',
+  'filters.owner': 'تصفية حسب المسؤول',
+  'filters.category': 'تصفية حسب التصنيف',
+  'filters.priority': 'تصفية حسب الأولوية',
+  'filters.anyStatus': 'كل الحالات',
+  'filters.anyOwner': 'كل المسؤولين',
+  'filters.anyCategory': 'كل التصنيفات',
+  'filters.anyPriority': 'كل الأولويات',
+  'filters.noMatch': 'لا توجد نتائج مطابقة لهذه التصفية',
+
+  'allRequests.title': 'كل الطلبات',
+  'allRequests.matching': {
+    zero: 'لا توجد نتائج',
+    one: 'نتيجة واحدة',
+    two: 'نتيجتان',
+    few: '{count} نتائج',
+    many: '{count} نتيجة',
+    other: '{count} نتيجة',
+  },
+
+  'myRequests.title': 'طلباتي',
+  'myRequests.empty': 'لم تقدّم أي طلب بعد',
+
+  'queue.title': 'قائمة العمل',
+  'queue.subtitle': 'الأعلى أولوية أولًا',
+
+  'dashboard.title': 'لوحة المتابعة',
+  'dashboard.subtitle': 'أين يقف العمل الآن',
+  'dashboard.open': 'مفتوحة',
+  'dashboard.unclaimed': 'غير مُسندة',
+  'dashboard.total': 'الإجمالي',
+  'dashboard.byStatus': 'حسب الحالة',
+  'dashboard.workload': 'التوزيع حسب المسؤول',
+  'dashboard.whoCarries': 'من يتحمّل ماذا',
+  'dashboard.empty': 'لم يُقدَّم أي طلب بعد.',
+
+  'people.title': 'الأشخاص',
+  'people.noAccounts': 'لا توجد حسابات بعد',
+  'people.active': 'نشط',
+  'people.deactivated': 'معطّل',
+  'people.name': 'الاسم',
+  'people.email': 'البريد الإلكتروني',
+  'people.role': 'الدور',
+  'people.tempPassword': 'كلمة مرور مؤقتة',
+  'people.newPassword': 'كلمة مرور جديدة',
+
+  'newRequest.title': 'طلب جديد',
+  'newRequest.subtitle': 'أخبر الدعم بما تحتاجه',
+  'newRequest.what': 'ما الذي تحتاجه؟',
+  'newRequest.details': 'التفاصيل',
+
+  'common.loading': 'جارٍ التحميل',
+  'common.retry': 'إعادة المحاولة',
+}

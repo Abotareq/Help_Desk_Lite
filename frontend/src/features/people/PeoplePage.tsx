@@ -14,8 +14,11 @@ import { useUpdateUser, useUsers } from '../../hooks/useUsers'
 import { UserRole, type OrphanedRequest, type User } from '../../types/domain'
 import { NewUserForm } from './NewUserForm'
 import { ResetPasswordDialog } from './ResetPasswordDialog'
+import { useI18n } from '../../hooks/useI18n'
 
 export function PeoplePage() {
+  const { t } = useI18n()
+
   const viewer = useCurrentUser()
   const { data: users, isPending, error } = useUsers()
   const updateUser = useUpdateUser()
@@ -58,7 +61,7 @@ export function PeoplePage() {
   return (
     <>
       <PageHeader
-        title="People"
+        title={t('people.title')}
         subtitle={users ? `${users.length} accounts` : undefined}
         actions={
           <Button variant="primary" size="sm" onClick={() => setCreating((open) => !open)}>
@@ -127,31 +130,31 @@ export function PeoplePage() {
             <Alert>{error instanceof ApiError ? error.message : 'Could not load people.'}</Alert>
           </div>
         ) : users.length === 0 ? (
-          <EmptyState title="No accounts yet" />
+          <EmptyState title={t('people.noAccounts')} />
         ) : (
           <div className="overflow-x-auto">
           <table className="w-full min-w-[46rem] border-collapse">
             <thead>
-              <tr className="border-b border-line text-left text-xs font-medium text-ink-subtle">
-                <th scope="col" className="py-2 pl-4 pr-3 font-medium">
+              <tr className="border-b border-line text-start text-xs font-medium text-ink-subtle">
+                <th scope="col" className="py-2 ps-4 pe-3 font-medium">
                   Name
                 </th>
-                <th scope="col" className="py-2 pr-3 font-medium">
+                <th scope="col" className="py-2 pe-3 font-medium">
                   Email
                 </th>
-                <th scope="col" className="w-32 py-2 pr-3 font-medium">
+                <th scope="col" className="w-32 py-2 pe-3 font-medium">
                   Role
                 </th>
-                <th scope="col" className="w-24 py-2 pr-3 font-medium">
+                <th scope="col" className="w-24 py-2 pe-3 font-medium">
                   Status
                 </th>
-                <th scope="col" className="w-56 py-2 pr-4 font-medium" />
+                <th scope="col" className="w-56 py-2 pe-4 font-medium" />
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user.id} className="border-b border-line last:border-0 hover:bg-canvas">
-                  <td className="py-2 pl-4 pr-3">
+                  <td className="py-2 ps-4 pe-3">
                     <span className="inline-flex items-center gap-2 text-sm text-ink">
                       <Avatar name={user.name} />
                       {user.name}
@@ -160,8 +163,8 @@ export function PeoplePage() {
                       ) : null}
                     </span>
                   </td>
-                  <td className="py-2 pr-3 text-sm text-ink-muted">{user.email}</td>
-                  <td className="py-2 pr-3">
+                  <td className="py-2 pe-3 text-sm text-ink-muted">{user.email}</td>
+                  <td className="py-2 pe-3">
                     <Select
                       aria-label={`Role for ${user.name}`}
                       className="h-7"
@@ -181,14 +184,14 @@ export function PeoplePage() {
                       ))}
                     </Select>
                   </td>
-                  <td className="py-2 pr-3">
+                  <td className="py-2 pe-3">
                     {user.isActive ? (
-                      <Badge>Active</Badge>
+                      <Badge>{t('people.active')}</Badge>
                     ) : (
-                      <Badge className="text-priority-high">Deactivated</Badge>
+                      <Badge className="text-priority-high">{t('people.deactivated')}</Badge>
                     )}
                   </td>
-                  <td className="py-2 pr-4 text-right">
+                  <td className="py-2 pe-4 text-end">
                     <div className="flex items-center justify-end gap-2">
                       <Button
                         size="sm"

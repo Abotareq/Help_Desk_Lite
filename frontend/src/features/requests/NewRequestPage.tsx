@@ -10,6 +10,7 @@ import { Select } from '../../components/ui/Select'
 import { Textarea } from '../../components/ui/Textarea'
 import { useCreateRequest } from '../../hooks/useRequests'
 import { RequestCategory, RequestPriority } from '../../types/domain'
+import { useI18n } from '../../hooks/useI18n'
 
 const CATEGORY_LABELS: Record<RequestCategory, string> = {
   [RequestCategory.IT]: 'IT — laptops, software, accounts, network',
@@ -30,6 +31,8 @@ const PRIORITY_LABELS: Record<RequestPriority, string> = {
  * one-minute job the brief asks for.
  */
 export function NewRequestPage() {
+  const { t } = useI18n()
+
   const navigate = useNavigate()
   const createRequest = useCreateRequest()
 
@@ -52,7 +55,7 @@ export function NewRequestPage() {
 
   return (
     <>
-      <PageHeader title="New request" subtitle="Tell support what you need" />
+      <PageHeader title={t('newRequest.title')} subtitle={t('newRequest.subtitle')} />
 
       <div className="flex-1 overflow-auto bg-canvas">
         <form onSubmit={handleSubmit} noValidate className="mx-auto max-w-2xl p-3 sm:p-6">
@@ -61,7 +64,7 @@ export function NewRequestPage() {
             {error && error.details.length === 0 ? <Alert>{error.message}</Alert> : null}
 
             <FormField
-              label="What do you need?"
+              label={t('newRequest.what')}
               htmlFor="title"
               error={error?.fieldError('title')}
               hint="A short summary — “Laptop will not boot”"
@@ -76,7 +79,7 @@ export function NewRequestPage() {
             </FormField>
 
             <FormField
-              label="Details"
+              label={t('newRequest.details')}
               htmlFor="description"
               error={error?.fieldError('description')}
               hint="What happened, when it started, and anything you have already tried."
@@ -91,7 +94,7 @@ export function NewRequestPage() {
             </FormField>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Category" htmlFor="category" error={error?.fieldError('category')}>
+              <FormField label={t('detail.category')} htmlFor="category" error={error?.fieldError('category')}>
                 <Select
                   id="category"
                   value={category}
@@ -109,7 +112,7 @@ export function NewRequestPage() {
                 </Select>
               </FormField>
 
-              <FormField label="Priority" htmlFor="priority" error={error?.fieldError('priority')}>
+              <FormField label={t('detail.priority')} htmlFor="priority" error={error?.fieldError('priority')}>
                 <Select
                   id="priority"
                   value={priority}
