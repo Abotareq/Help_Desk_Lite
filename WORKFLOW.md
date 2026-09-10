@@ -1,6 +1,6 @@
 # HelpDesk Lite — how this project is built
 
-Empty repo → 27 merged PRs, `main` at `9edf195`, 350 backend + 141 frontend tests green.
+Empty repo → 31 merged PRs, `main` at `ad28edd`, 374 backend + 184 frontend tests green.
 
 `HANDOFF.md` is the *state* — what exists and which decisions are load-bearing.
 This is the *method* — how each change gets made, and the mistakes that are worth
@@ -37,6 +37,10 @@ Corollaries learned the hard way:
 - `if (false && …)` won't compile — tsc rejects unreachable code. Use
   `Boolean(process.env.__NEVER_SET__)` when you need a mutation that type-checks.
 
+**A green test run is not a compiling build.** `vitest` does not typecheck. A test file
+that passed still broke `npm run build`, because `as const` literal types defeated a type
+guard the test relied on. Run the build, not just the suite.
+
 **A mutation that survives because a *different* rule refused the call.** This is
 indistinguishable from a working test if you only watch the colour. KAN-52's
 pre-move comment check looked guarded until the mutation showed the test was
@@ -45,9 +49,28 @@ only the thing under test can fail.
 
 ---
 
+## Measuring the browser, not reading it
+
+Two habits that cost real time this session, both worth keeping:
+
+**Do not judge from a scaled screenshot.** Twice I read a toggle as showing the wrong
+selection and started debugging; both times `aria-checked` said it was correct. RTL flips the
+visual order, and downscaled images lose the highlight. Assert the DOM.
+
+**Transitions do not advance while the browser pane is hidden.** No animation frames fire, so
+a `transition-colors` property started by a theme flip stays pinned at its old value forever —
+`setTimeout` does not help, because it is frames and not time. Any measurement of a
+transitioned property after a live theme change is a lie. Reload with the theme already set
+instead. This one cost about six steps of chasing a phantom through the code, the dev server
+and the production build before the cause turned out to be the measurement.
+
+**And the dev server goes stale.** Its Tailwind output and HMR module graph both got into
+states where the page disagreed with the source. When something makes no sense, check against
+`npm run build` output before believing it.
+
 ## What driving the browser found that no test did
 
-Six defects, none visible from reading the code:
+Nine defects, none visible from reading the code:
 
 1. A raw ObjectId (`Assigned to 6a9ca36f…`) reaching a requester's timeline.
 2. An employee unable to see who was handling their request — a PRD requirement.
@@ -57,6 +80,12 @@ Six defects, none visible from reading the code:
    server's HMR log, which no test reads.
 6. A sidebar that reported itself open while sitting off-screen at
    `marginLeft: -224px`. Measuring the DOM caught what the class list did not.
+7. White on the dark theme's brand at 3.14:1 — below AA, on the primary button. The brand
+   fill inverts between themes; a hard-coded white label cannot be right in both.
+8. The request list rendering `FACILITIES` where the detail page rendered `Facilities`.
+   Invisible to every test, since none assert on casing.
+9. An English comment inside an Arabic page rendering its trailing punctuation at the front,
+   because it inherited the page's RTL direction instead of declaring its own.
 
 ---
 
@@ -78,6 +107,10 @@ Six defects, none visible from reading the code:
 | 24 | KAN-52 comments, internal notes, merged Activity timeline |
 | 25–26 | Handoff corrected against actual state; 25 merged branches pruned |
 | 27 | Vercel: serverless entry point, connection reuse, routing |
+| 28 | WORKFLOW.md |
+| 29 | KAN-66 a handler can correct a request's category |
+| 30 | KAN-67 dark theme, as a token swap |
+| 31 | KAN-68 English and Arabic, with RTL |
 
 ---
 
@@ -98,6 +131,16 @@ pattern repeats, not because the individual bugs matter.
 - **PR #27's first connection cache** returned whatever it connected to first
   regardless of the URI, and never checked the socket was open. The *existing* suite
   caught it, not the new tests written alongside the feature.
+- **A Jira key was invented rather than looked up.** A commit referenced KAN-60 on the
+  assumption it was the category ticket; KAN-60 is a Done epic called "Web Client", and no
+  ticket existed at all. Caught only because the loop says to check before commenting. Look
+  the key up, every time.
+- **The live site sat three PRs behind for two days.** Vercel's git integration was never
+  connected, the setup deploy was manual, and nobody said so. Merging is not shipping unless
+  something is actually watching `main`.
+- **A code comment claimed Arabic-Indic digits** where the chosen locale produces Latin ones.
+  Generic `ar` resolves to `latn` in CLDR. The comment was written from expectation rather
+  than from running it.
 
 Report honestly, including what you got wrong. Every entry above was cheaper to
 state than to leave for the next session to discover.
